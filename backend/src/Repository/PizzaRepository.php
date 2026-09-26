@@ -15,4 +15,10 @@ class PizzaRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Pizza::class);
     }
+
+    /** @return list<Pizza> pizzas visibles sur le site client */
+    public function findAvailable(): array
+    {
+        return $this->findBy(['available' => true], ['name' => 'ASC']);
+    }
 }
