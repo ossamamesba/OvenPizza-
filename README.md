@@ -7,7 +7,7 @@ Système complet du restaurant : API Symfony, site client React (PWA) et applica
 ```
 backend/   API Symfony 7.4 (PHP 8.3, Doctrine, MySQL)
 docker/    Configuration des conteneurs PHP et Nginx
-frontend/  Site client React + TypeScript (PWA)        — à venir
+frontend/  Site client React + TypeScript (PWA)
 mobile/    Application du patron React Native (Expo)   — à venir
 ```
 
@@ -21,6 +21,7 @@ docker compose exec php composer install          # première fois uniquement
 
 | Service    | URL                     |
 |------------|-------------------------|
+| Site client| http://localhost:5173   |
 | API        | http://localhost:8080   |
 | MySQL      | localhost:3307 (app/app)|
 | phpMyAdmin | http://localhost:8081 (`docker compose --profile tools up -d`) |
