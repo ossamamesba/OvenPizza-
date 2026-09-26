@@ -1,0 +1,28 @@
+# Oven's Pizza Party
+
+Système complet du restaurant : API Symfony, site client React (PWA) et application mobile du patron.
+
+## Structure
+
+```
+backend/   API Symfony 7.4 (PHP 8.3, Doctrine, MySQL)
+docker/    Configuration des conteneurs PHP et Nginx
+frontend/  Site client React + TypeScript (PWA)        — à venir
+mobile/    Application du patron React Native (Expo)   — à venir
+```
+
+## Démarrage (Docker, WSL recommandé)
+
+```bash
+cp .env.example .env                              # facultatif
+docker compose up -d --build
+docker compose exec php composer install          # première fois uniquement
+```
+
+| Service    | URL                     |
+|------------|-------------------------|
+| API        | http://localhost:8080   |
+| MySQL      | localhost:3307 (app/app)|
+| phpMyAdmin | http://localhost:8081 (`docker compose --profile tools up -d`) |
+
+Commandes Symfony : `docker compose exec php php bin/console <commande>`
