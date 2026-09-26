@@ -26,3 +26,19 @@ docker compose exec php composer install          # première fois uniquement
 | phpMyAdmin | http://localhost:8081 (`docker compose --profile tools up -d`) |
 
 Commandes Symfony : `docker compose exec php php bin/console <commande>`
+
+## Première installation du backend
+
+```bash
+docker compose exec php composer install
+docker compose exec php php bin/console doctrine:migrations:migrate -n
+docker compose exec php php bin/console lexik:jwt:generate-keypair      # clés JWT (non versionnées)
+docker compose exec php php bin/console app:create-admin patron@exemple.ma
+docker compose exec php php bin/console doctrine:fixtures:load -n        # données de démo (vide la base !)
+```
+
+## API
+
+- Public : `GET /api/pizzas`, `GET /api/pizzas/{id}`, `POST /api/reservations`
+- Login : `POST /api/login` `{"email", "password"}` → `{"token", "user"}`
+- Patron (en-tête `Authorization: Bearer <token>`) : `/api/admin/me`, `/api/admin/pizzas`, `/api/admin/reservations`

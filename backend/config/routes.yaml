@@ -9,3 +9,8 @@
 
 controllers:
     resource: routing.controllers
+
+# Géré par le pare-feu « login » (config/packages/security.yaml) : aucun contrôleur nécessaire.
+api_login:
+    path: /api/login
+    methods: [POST]
