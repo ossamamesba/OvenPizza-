@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Phone } from 'lucide-react'
+import { AtSign, MapPin, Phone } from 'lucide-react'
 import { restaurant } from '../../config/restaurant'
 import { LogoMark } from '../Logo'
 
@@ -12,6 +12,17 @@ export function Footer() {
             <LogoMark className="size-12" /> {restaurant.name}
           </p>
           <p className="mt-3 max-w-xs">{restaurant.tagline}</p>
+          {restaurant.social.instagram && (
+            <a
+              href={restaurant.social.instagram}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-semibold text-white ring-1 ring-white/25 hover:bg-white/10"
+            >
+              <AtSign className="size-4" aria-hidden="true" /> ovenspizzaparty
+              <span className="sr-only">(Instagram, nouvel onglet)</span>
+            </a>
+          )}
         </div>
         <address className="space-y-2 not-italic">
           <p className="flex gap-2">

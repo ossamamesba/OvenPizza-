@@ -31,7 +31,7 @@ export const restaurant = {
   ] satisfies TimeRange[][],
   /** Laisser vide pour masquer un réseau. */
   social: {
-    instagram: '',
+    instagram: 'https://www.instagram.com/ovenspizzaparty/',
     facebook: '',
     whatsapp: '',
   },
