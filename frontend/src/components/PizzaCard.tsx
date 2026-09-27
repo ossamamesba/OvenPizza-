@@ -1,9 +1,10 @@
 import { PizzaMark } from './Logo'
-import { formatPrice, pizzaImageUrl } from '../lib/format'
-import type { Pizza } from '../types/api'
+import { formatPrice, pizzaImageUrl } from '@shared/lib/format'
+import { API_URL } from '../api/client'
+import type { Pizza } from '@shared/api/types'
 
 export function PizzaCard({ pizza }: { pizza: Pizza }) {
-  const image = pizzaImageUrl(pizza.image)
+  const image = pizzaImageUrl(pizza.image, API_URL)
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card ring-1 ring-border">

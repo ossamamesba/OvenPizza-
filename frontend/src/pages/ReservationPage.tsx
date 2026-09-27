@@ -5,8 +5,8 @@ import { createReservation } from '../api/reservations'
 import { ButtonLink } from '../components/ButtonLink'
 import { PageHeader } from '../components/PageHeader'
 import { isClosedOn, reservationSlots, restaurant } from '../config/restaurant'
-import { toIsoDate } from '../lib/format'
-import type { Reservation, ReservationInput } from '../types/api'
+import { formatDate, toIsoDate } from '@shared/lib/format'
+import type { Reservation, ReservationInput } from '@shared/api/types'
 
 type Field = keyof ReservationInput
 type Errors = Partial<Record<Field, string>>
@@ -86,7 +86,7 @@ export function ReservationPage() {
           <h1 className="mt-4 text-3xl font-bold">Demande envoyée !</h1>
           <p className="mt-3 text-muted">
             Merci {confirmed.customerName}. Votre demande pour <strong>{confirmed.numberOfPeople} personne(s)</strong> le{' '}
-            <strong>{new Date(`${confirmed.date}T00:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</strong>{' '}
+            <strong>{formatDate(confirmed.date)}</strong>{' '}
             à <strong>{confirmed.time}</strong> est en attente de confirmation. Le restaurant vous contactera au {confirmed.phone}.
           </p>
           <ButtonLink to="/" variant="outline" className="mt-8">Retour à l'accueil</ButtonLink>

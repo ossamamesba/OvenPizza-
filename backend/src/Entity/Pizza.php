@@ -42,9 +42,9 @@ class Pizza
     #[Assert\Regex(pattern: '/^\d{1,6}(\.\d{1,2})?$/', message: 'Prix invalide (ex : 45 ou 45.50).')]
     private ?string $price = null;
 
-    /** Nom du fichier image (stocké dans public/uploads/pizzas). */
+    /** Nom du fichier image (stocké dans public/uploads/pizzas). Modifiable uniquement via l'envoi de photo. */
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['pizza:read', 'pizza:write'])]
+    #[Groups(['pizza:read'])]
     private ?string $image = null;
 
     #[ORM\Column(name: 'is_available')]

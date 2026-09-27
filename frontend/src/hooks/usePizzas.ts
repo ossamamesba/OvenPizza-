@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getPizzas } from '../api/pizzas'
 import { ApiError } from '../api/client'
-import type { Pizza } from '../types/api'
+import type { Pizza } from '@shared/api/types'
 
 type State =
   | { status: 'loading' }

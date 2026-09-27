@@ -1,4 +1,4 @@
-import type { Reservation, ReservationInput } from '../types/api'
+import type { Reservation, ReservationInput } from '@shared/api/types'
 import { apiFetch } from './client'
 
 export const createReservation = (input: ReservationInput) =>

@@ -5,12 +5,20 @@ namespace App\Controller\Api\Admin;
 use App\Entity\Pizza;
 use App\Http\JsonPayloadMapper;
 use App\Repository\PizzaRepository;
+use App\Service\PizzaImageStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /** Gestion du menu par le patron (dashboard web + application mobile). */
 #[Route('/api/admin/pizzas', name: 'api_admin_pizza_')]
@@ -22,6 +30,7 @@ final class PizzaController extends AbstractController
     public function __construct(
         private readonly JsonPayloadMapper $mapper,
         private readonly EntityManagerInterface $em,
+        private readonly PizzaImageStorage $images,
     ) {
     }
 
@@ -61,9 +70,48 @@ final class PizzaController extends AbstractController
     #[Route('/{id<\d+>}', name: 'delete', methods: ['DELETE'])]
     public function delete(Pizza $pizza): Response
     {
+        $this->images->remove($pizza);
         $this->em->remove($pizza);
         $this->em->flush();
 
         return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    /** Envoi de photo : multipart/form-data avec le champ « image » (JPG, PNG ou WebP, 5 Mo max). */
+    #[Route('/{id<\d+>}/image', name: 'upload_image', methods: ['POST'])]
+    public function uploadImage(Pizza $pizza, Request $request, ValidatorInterface $validator): JsonResponse
+    {
+        $file = $request->files->get('image');
+        if (!$file instanceof UploadedFile) {
+            throw new BadRequestHttpException('Aucun fichier reçu (champ « image »).');
+        }
+
+        $errors = $validator->validate($file, new Image(
+            maxSize: '5M',
+            mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+            mimeTypesMessage: 'Formats acceptés : JPG, PNG ou WebP.',
+            maxSizeMessage: 'Image trop lourde (5 Mo maximum).',
+        ));
+        if (\count($errors) > 0) {
+            $violations = new ConstraintViolationList();
+            foreach ($errors as $error) {
+                $violations->add(new ConstraintViolation($error->getMessage(), null, [], null, 'image', null));
+            }
+            throw new ValidationFailedException($file, $violations);
+        }
+
+        $this->images->replace($pizza, $file);
+        $this->em->flush();
+
+        return $this->json($pizza, context: self::READ);
+    }
+
+    #[Route('/{id<\d+>}/image', name: 'delete_image', methods: ['DELETE'])]
+    public function deleteImage(Pizza $pizza): JsonResponse
+    {
+        $this->images->remove($pizza);
+        $this->em->flush();
+
+        return $this->json($pizza, context: self::READ);
     }
 }
