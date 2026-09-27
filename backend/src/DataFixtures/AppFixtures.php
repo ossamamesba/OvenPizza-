@@ -5,29 +5,46 @@ namespace App\DataFixtures;
 use App\Entity\Pizza;
 use App\Entity\Reservation;
 use App\Enum\ReservationStatus;
+use App\Service\PizzaImageStorage;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-/** Données de démonstration (développement uniquement) : doctrine:fixtures:load */
+/**
+ * Données de démonstration (développement uniquement) : doctrine:fixtures:load
+ * Menu réel du restaurant — ⚠️ prix et descriptions à confirmer avec le patron.
+ * En production, le patron gère le menu depuis le dashboard ou l'app mobile.
+ */
 class AppFixtures extends Fixture
 {
+    /** [nom, description, prix (DH), disponible, photo dans fixtures/pizzas/] */
     private const PIZZAS = [
-        ['Margherita', 'Sauce tomate, mozzarella, basilic frais.', 45, true],
-        ['Reine', 'Sauce tomate, mozzarella, jambon de dinde, champignons.', 55, true],
-        ['Quatre Fromages', 'Mozzarella, gorgonzola, emmental, parmesan.', 65, true],
-        ['Végétarienne', 'Poivrons, oignons, olives, champignons, tomates cerises.', 55, true],
-        ['Pepperoni', 'Sauce tomate, mozzarella, pepperoni de bœuf.', 60, true],
-        ['Fruits de Mer', 'Crevettes, calamars, moules, ail, persil.', 80, false],
+        ['Margherita', 'Sauce tomate, mozzarella fior di latte, basilic frais, huile d’olive.', 50, true, 'margherita.jpg'],
+        ['Pepperoni', 'Sauce tomate, mozzarella, pepperoni de bœuf.', 65, true, 'pepperoni.jpg'],
+        ['Chèvre Miel', 'Crème, mozzarella, fromage de chèvre, miel, noix, thym.', 70, true, 'chevre-miel.jpg'],
+        ['Burrata', 'Sauce tomate, burrata crémeuse, tomates cerises, roquette, parmesan.', 85, true, 'burrata.jpg'],
+        ['Truffe', 'Crème de truffe noire, mozzarella, roquette, jeunes pousses.', 95, true, 'truffe.jpg'],
     ];
+
+    public function __construct(
+        private readonly PizzaImageStorage $images,
+        #[Autowire('%kernel.project_dir%/fixtures/pizzas')] private readonly string $photosDir,
+    ) {
+    }
 
     public function load(ObjectManager $manager): void
     {
-        foreach (self::PIZZAS as [$name, $description, $price, $available]) {
-            $manager->persist((new Pizza())
+        // Les pizzas viennent d'être supprimées : on supprime aussi leurs anciennes photos.
+        $this->images->removeAll();
+
+        foreach (self::PIZZAS as [$name, $description, $price, $available, $photo]) {
+            $pizza = (new Pizza())
                 ->setName($name)
                 ->setDescription($description)
                 ->setPrice($price)
-                ->setAvailable($available));
+                ->setAvailable($available);
+            $this->images->storeCopy($pizza, $this->photosDir.'/'.$photo);
+            $manager->persist($pizza);
         }
 
         $reservations = [

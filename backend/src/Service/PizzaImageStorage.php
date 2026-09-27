@@ -28,6 +28,22 @@ final class PizzaImageStorage
         $pizza->setImage($filename);
     }
 
+    /** Copie une image existante (ex. photos des données de démo) comme photo de la pizza. */
+    public function storeCopy(Pizza $pizza, string $sourcePath): void
+    {
+        $filename = bin2hex(random_bytes(16)).'.'.strtolower(pathinfo($sourcePath, \PATHINFO_EXTENSION));
+        $this->filesystem->copy($sourcePath, $this->directory.'/'.$filename);
+
+        $this->remove($pizza);
+        $pizza->setImage($filename);
+    }
+
+    /** Supprime toutes les photos (utilisé uniquement par les données de démo, qui repartent de zéro). */
+    public function removeAll(): void
+    {
+        $this->filesystem->remove($this->directory);
+    }
+
     public function remove(Pizza $pizza): void
     {
         if (null !== $pizza->getImage()) {

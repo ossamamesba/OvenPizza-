@@ -8,11 +8,11 @@ export function PizzaCard({ pizza }: { pizza: Pizza }) {
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card ring-1 ring-border">
-      <div className="aspect-[4/3] bg-accent-soft">
+      <div className="bg-accent-soft">
         {image ? (
-          <img src={image} alt={`Pizza ${pizza.name}`} loading="lazy" width={640} height={480} className="size-full object-cover" />
+          <img src={image} alt={`Pizza ${pizza.name}`} loading="lazy" width={640} height={480} className="aspect-[4/3] w-full object-cover" />
         ) : (
-          <div className="grid size-full place-items-center">
+          <div className="grid aspect-[4/3] w-full place-items-center">
             <PizzaMark className="size-28 opacity-90" />
           </div>
         )}
