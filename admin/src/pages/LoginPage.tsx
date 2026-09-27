@@ -35,7 +35,7 @@ export function LoginPage() {
     <main className="grid min-h-dvh place-items-center bg-foreground px-4 py-10">
       <title>Connexion — Dashboard Oven's Pizza</title>
       <div className="w-full max-w-sm rounded-card bg-surface p-8 shadow-card">
-        <img src="/favicon.svg" alt="" className="mx-auto size-14" />
+        <img src="/logo.webp" alt="Oven's Pizza Party" className="mx-auto size-24 rounded-full" />
         <h1 className="mt-4 text-center text-2xl font-bold">Espace patron</h1>
         <p className="mt-1 text-center text-muted">Oven&rsquo;s Pizza Party</p>
 

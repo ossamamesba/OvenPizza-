@@ -1,4 +1,4 @@
-import { PizzaMark } from './Logo'
+import { LogoMark } from './Logo'
 import { formatPrice, pizzaImageUrl } from '@shared/lib/format'
 import { API_URL } from '../api/client'
 import type { Pizza } from '@shared/api/types'
@@ -13,7 +13,7 @@ export function PizzaCard({ pizza }: { pizza: Pizza }) {
           <img src={image} alt={`Pizza ${pizza.name}`} loading="lazy" width={640} height={480} className="aspect-[4/3] w-full object-cover" />
         ) : (
           <div className="grid aspect-[4/3] w-full place-items-center">
-            <PizzaMark className="size-28 opacity-90" />
+            <LogoMark className="size-28 opacity-90" />
           </div>
         )}
       </div>

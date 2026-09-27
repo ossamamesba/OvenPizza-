@@ -21,6 +21,7 @@ class AppFixtures extends Fixture
     private const PIZZAS = [
         ['Margherita', 'Sauce tomate, mozzarella fior di latte, basilic frais, huile d’olive.', 50, true, 'margherita.jpg'],
         ['Pepperoni', 'Sauce tomate, mozzarella, pepperoni de bœuf.', 65, true, 'pepperoni.jpg'],
+        ['Quatre Fromages', 'Mozzarella, gorgonzola, emmental, parmesan.', 75, true, 'quatre-fromages.jpg'],
         ['Chèvre Miel', 'Crème, mozzarella, fromage de chèvre, miel, noix, thym.', 70, true, 'chevre-miel.jpg'],
         ['Burrata', 'Sauce tomate, burrata crémeuse, tomates cerises, roquette, parmesan.', 85, true, 'burrata.jpg'],
         ['Truffe', 'Crème de truffe noire, mozzarella, roquette, jeunes pousses.', 95, true, 'truffe.jpg'],

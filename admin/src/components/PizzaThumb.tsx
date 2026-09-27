@@ -7,7 +7,7 @@ export function PizzaThumb({ image, className = 'size-16' }: { image: string | n
     <img src={url} alt="" loading="lazy" className={`${className} shrink-0 rounded-xl object-cover`} />
   ) : (
     <span className={`${className} grid shrink-0 place-items-center rounded-xl bg-accent-soft`} aria-hidden="true">
-      <img src="/favicon.svg" alt="" className="size-1/2 opacity-80" />
+      <img src="/logo.webp" alt="" className="size-3/4 rounded-full opacity-80" />
     </span>
   )
 }

@@ -99,7 +99,7 @@ export function AdminLayout() {
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <p className={`flex items-center gap-2 font-display font-bold ${compact ? 'text-base' : 'px-6 py-6 text-lg'}`}>
-      <img src="/favicon.svg" alt="" className={compact ? 'size-7' : 'size-9'} />
+      <img src="/logo.webp" alt="" className={`${compact ? 'size-8' : 'size-11'} rounded-full`} />
       <span>
         Oven&rsquo;s Pizza <span className="block font-sans text-xs font-semibold uppercase tracking-wider text-white/60">Dashboard</span>
       </span>

@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom'
 import { MapPin, Phone } from 'lucide-react'
 import { restaurant } from '../../config/restaurant'
-import { PizzaMark } from '../Logo'
+import { LogoMark } from '../Logo'
 
 export function Footer() {
   return (
     <footer className="mt-20 bg-foreground text-white/85">
       <div className="container-page grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-3">
         <div>
-          <p className="flex items-center gap-2 font-display text-xl font-bold text-white">
-            <PizzaMark className="size-8" /> {restaurant.name}
+          <p className="flex items-center gap-3 font-display text-xl font-bold text-white">
+            <LogoMark className="size-12" /> {restaurant.name}
           </p>
           <p className="mt-3 max-w-xs">{restaurant.tagline}</p>
         </div>

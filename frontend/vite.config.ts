@@ -18,7 +18,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'logo.webp'],
       manifest: {
         name: "Oven's Pizza Party",
         short_name: "Oven's Pizza",
