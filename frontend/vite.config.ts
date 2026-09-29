@@ -38,8 +38,8 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api/, /^\/uploads/],
         runtimeCaching: [
           {
-            // Menu : toujours la version la plus récente, mais consultable hors connexion.
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/pizzas'),
+            // Packs et pizzas : toujours la version la plus récente, mais consultables hors connexion.
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/packs') || url.pathname.startsWith('/api/pizzas'),
             handler: 'NetworkFirst',
             options: { cacheName: 'api-menu', networkTimeoutSeconds: 5, expiration: { maxAgeSeconds: 7 * 24 * 3600 } },
           },

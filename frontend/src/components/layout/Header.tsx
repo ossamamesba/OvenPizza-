@@ -5,8 +5,8 @@ import { Logo } from '../Logo'
 
 const links = [
   { to: '/', label: 'Accueil' },
-  { to: '/menu', label: 'Menu' },
-  { to: '/infos', label: 'Infos & horaires' },
+  { to: '/packs', label: 'Nos packs' },
+  { to: '/contact', label: 'Contact' },
 ]
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -32,7 +32,7 @@ export function Header() {
             </NavLink>
           ))}
           <Link
-            to="/reservation"
+            to="/packs"
             className="ml-2 inline-flex min-h-11 items-center rounded-full bg-primary px-5 font-semibold text-on-primary transition-colors hover:bg-primary-hover"
           >
             Réserver
@@ -63,10 +63,10 @@ export function Header() {
             ))}
             <li className="pt-2">
               <Link
-                to="/reservation"
+                to="/packs"
                 className="flex min-h-12 items-center justify-center rounded-full bg-primary font-semibold text-on-primary"
               >
-                Réserver une table
+                Réserver ma pizza party
               </Link>
             </li>
           </ul>

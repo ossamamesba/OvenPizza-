@@ -5,10 +5,8 @@ namespace App\Entity;
 use App\Repository\PizzaRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PizzaRepository::class)]
@@ -31,16 +29,10 @@ class Pizza
     #[Groups(['pizza:read', 'pizza:write'])]
     private ?string $description = null;
 
-    /**
-     * Prix en dirhams (DH), stocké en DECIMAL pour éviter les erreurs d'arrondi.
-     * Accepte 50, 58.5 ou "58.50" en entrée ; toujours renvoyé en texte ("58.50").
-     */
-    #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
-    #[Groups(['pizza:read', 'pizza:write'])]
-    #[Context(denormalizationContext: [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true])]
-    #[Assert\NotBlank]
-    #[Assert\Regex(pattern: '/^\d{1,6}(\.\d{1,2})?$/', message: 'Prix invalide (ex : 45 ou 45.50).')]
-    private ?string $price = null;
+    /** Pack auquel appartient la pizza (le prix est celui du pack). Null = hors pack, non proposée. */
+    #[ORM\ManyToOne(inversedBy: 'pizzas')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?Pack $pack = null;
 
     /** Nom du fichier image (stocké dans public/uploads/pizzas). Modifiable uniquement via l'envoi de photo. */
     #[ORM\Column(length: 255, nullable: true)]
@@ -102,16 +94,22 @@ class Pizza
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPack(): ?Pack
     {
-        return $this->price;
+        return $this->pack;
     }
 
-    public function setPrice(string|int|float $price): static
+    public function setPack(?Pack $pack): static
     {
-        $this->price = is_numeric($price) ? number_format((float) $price, 2, '.', '') : (string) $price;
+        $this->pack = $pack;
 
         return $this;
+    }
+
+    #[Groups(['pizza:read'])]
+    public function getPackId(): ?int
+    {
+        return $this->pack?->getId();
     }
 
     public function getImage(): ?string

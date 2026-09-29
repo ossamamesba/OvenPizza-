@@ -4,6 +4,7 @@ namespace App\Controller\Api\Admin;
 
 use App\Entity\Pizza;
 use App\Http\JsonPayloadMapper;
+use App\Repository\PackRepository;
 use App\Repository\PizzaRepository;
 use App\Service\PizzaImageStorage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +32,7 @@ final class PizzaController extends AbstractController
         private readonly JsonPayloadMapper $mapper,
         private readonly EntityManagerInterface $em,
         private readonly PizzaImageStorage $images,
+        private readonly PackRepository $packs,
     ) {
     }
 
@@ -50,6 +52,7 @@ final class PizzaController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $pizza = $this->mapper->map($request, Pizza::class, self::WRITE);
+        $this->applyPack($pizza, $request);
 
         $this->em->persist($pizza);
         $this->em->flush();
@@ -62,6 +65,7 @@ final class PizzaController extends AbstractController
     public function update(Pizza $pizza, Request $request): JsonResponse
     {
         $this->mapper->map($request, $pizza, self::WRITE);
+        $this->applyPack($pizza, $request);
         $this->em->flush();
 
         return $this->json($pizza, context: self::READ);
@@ -113,5 +117,22 @@ final class PizzaController extends AbstractController
         $this->em->flush();
 
         return $this->json($pizza, context: self::READ);
+    }
+
+    /** Pack de la pizza : {"packId": 2} pour l'associer, {"packId": null} pour la retirer du pack. */
+    private function applyPack(Pizza $pizza, Request $request): void
+    {
+        $payload = json_decode($request->getContent(), true);
+        if (!\is_array($payload) || !\array_key_exists('packId', $payload)) {
+            return;
+        }
+
+        $pack = null === $payload['packId'] ? null : $this->packs->find((int) $payload['packId']);
+        if (null !== $payload['packId'] && null === $pack) {
+            throw new ValidationFailedException($pizza, new ConstraintViolationList([
+                new ConstraintViolation('Pack introuvable.', null, [], $pizza, 'packId', $payload['packId']),
+            ]));
+        }
+        $pizza->setPack($pack);
     }
 }

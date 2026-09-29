@@ -1,32 +1,32 @@
-import { ArrowRight, ChefHat, Clock, Flame, Leaf, MapPin, Phone } from 'lucide-react'
+import { ArrowRight, ChefHat, Flame, Leaf, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ButtonLink } from '../components/ButtonLink'
 import { LogoMark } from '../components/Logo'
-import { PizzaGrid } from '../components/PizzaGrid'
-import { hoursLabel, restaurant } from '../config/restaurant'
+import { LoadError } from '../components/LoadError'
+import { PackCard } from '../components/PackCard'
+import { phoneHref, restaurant, whatsappHref } from '../config/restaurant'
+import { usePacks } from '../hooks/usePacks'
 
 export function HomePage() {
-  const todayHours = hoursLabel(restaurant.openingHours[new Date().getDay()])
-
   return (
     <>
-      <title>{`${restaurant.name} — Pizzeria à ${restaurant.address.city}`}</title>
+      <title>{`${restaurant.name} — Pizza party à domicile, ${restaurant.zones.join(' & ')}`}</title>
 
       {/* Hero */}
       <section className="overflow-hidden">
         <div className="container-page grid items-center gap-10 py-12 md:grid-cols-2 md:py-20">
           <div>
             <p className="mb-4 inline-block rounded-full bg-accent-soft px-4 py-1.5 font-semibold text-accent">
-              Pizzeria à {restaurant.address.city}
+              {restaurant.zones.join(' · ')}
             </p>
             <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl">
-              La fête commence <span className="text-primary">au four.</span>
+              La pizza party vient <span className="text-primary">chez vous.</span>
             </h1>
             <p className="mt-5 max-w-lg text-lg text-muted md:text-xl">{restaurant.tagline}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink to="/reservation">Réserver une table</ButtonLink>
-              <ButtonLink to="/menu" variant="outline">
-                Voir le menu <ArrowRight className="size-4" aria-hidden="true" />
+              <ButtonLink to="/packs">Découvrir nos packs</ButtonLink>
+              <ButtonLink to="/contact" variant="outline">
+                Nous contacter <ArrowRight className="size-4" aria-hidden="true" />
               </ButtonLink>
             </div>
           </div>
@@ -53,35 +53,38 @@ export function HomePage() {
       <section aria-label="Infos pratiques" className="container-page">
         <ul className="grid gap-4 rounded-card bg-surface p-6 shadow-card ring-1 ring-border sm:grid-cols-3">
           <li className="flex items-start gap-3">
-            <Clock className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
-            <span><strong className="block">Aujourd'hui</strong>{todayHours}</span>
-          </li>
-          <li className="flex items-start gap-3">
             <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
-            <span><strong className="block">Adresse</strong>{restaurant.address.street}, {restaurant.address.city}</span>
+            <span><strong className="block">Zones desservies</strong>{restaurant.zones.join(' · ')}</span>
           </li>
           <li className="flex items-start gap-3">
             <Phone className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
             <span>
               <strong className="block">Téléphone</strong>
-              <a href={`tel:${restaurant.phone.replace(/\s/g, '')}`} className="hover:text-primary">{restaurant.phone}</a>
+              <a href={phoneHref} className="hover:text-primary">{restaurant.phone}</a>
+            </span>
+          </li>
+          <li className="flex items-start gap-3">
+            <MessageCircle className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" />
+            <span>
+              <strong className="block">WhatsApp</strong>
+              <a href={whatsappHref()} target="_blank" rel="noreferrer" className="hover:text-primary">Écrivez-nous</a>
             </span>
           </li>
         </ul>
       </section>
 
-      {/* Aperçu du menu */}
-      <section className="container-page mt-20" aria-labelledby="favorites-title">
+      {/* Aperçu des packs */}
+      <section className="container-page mt-20" aria-labelledby="packs-title">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 id="favorites-title" className="text-3xl font-bold md:text-4xl">Nos pizzas</h2>
-            <p className="mt-2 text-muted">Pâte pétrie chaque matin, ingrédients frais.</p>
+            <h2 id="packs-title" className="text-3xl font-bold md:text-4xl">Nos packs</h2>
+            <p className="mt-2 text-muted">Choisissez votre formule, puis jusqu'à 3 pizzas pour vos invités.</p>
           </div>
-          <Link to="/menu" className="inline-flex min-h-11 items-center gap-1 font-semibold text-primary hover:underline">
-            Tout le menu <ArrowRight className="size-4" aria-hidden="true" />
+          <Link to="/packs" className="inline-flex min-h-11 items-center gap-1 font-semibold text-primary hover:underline">
+            Composer mon pack <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
-        <PizzaGrid limit={3} />
+        <PacksPreview />
       </section>
 
       {/* Savoir-faire : le côté humain */}
@@ -102,8 +105,8 @@ export function HomePage() {
             <p className="font-semibold uppercase tracking-wider text-accent">Notre savoir-faire</p>
             <h2 id="story-title" className="mt-2 text-3xl font-bold md:text-4xl">Fait main, cuit devant vous.</h2>
             <p className="mt-4 text-lg text-muted">
-              Chez {restaurant.name}, chaque pizza est étalée à la main, garnie à la minute et sortie du four sous vos yeux.
-              Pas de secret : une bonne pâte, de bons produits et beaucoup de passion.
+              Anniversaires, mariages, soirées privées ou événements d'entreprise : nous installons notre stand et notre four
+              chez vous. Chaque pizza est étalée à la main, garnie à la minute et sortie du four sous les yeux de vos invités.
             </p>
             <ul className="mt-8 space-y-5">
               {[
@@ -129,18 +132,35 @@ export function HomePage() {
       {/* Appel à réserver */}
       <section className="container-page mt-20">
         <div className="rounded-card bg-primary px-6 py-12 text-center text-on-primary md:px-12">
-          <h2 className="text-3xl font-bold md:text-4xl">Une table pour ce soir ?</h2>
+          <h2 className="text-3xl font-bold md:text-4xl">Une fête en préparation ?</h2>
           <p className="mx-auto mt-3 max-w-xl text-white/90">
-            Réservez en ligne en une minute, le restaurant vous confirme rapidement.
+            Composez votre pack en une minute, nous vous rappelons pour tout organiser.
           </p>
           <Link
-            to="/reservation"
+            to="/packs"
             className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-surface px-8 font-semibold text-primary transition-colors hover:bg-accent-soft"
           >
-            Réserver maintenant
+            Réserver ma pizza party
           </Link>
         </div>
       </section>
     </>
+  )
+}
+
+function PacksPreview() {
+  const { state, retry } = usePacks()
+  if (state.status === 'loading') return <p role="status" className="py-8 text-center text-muted">Chargement des packs…</p>
+  if (state.status === 'error') return <LoadError message={state.message} onRetry={retry} />
+  return (
+    <ul className="grid gap-5 md:grid-cols-2">
+      {state.packs.map((pack) => (
+        <li key={pack.id}>
+          <Link to="/packs" className="block h-full rounded-card focus-visible:outline-3" aria-label={`${pack.name} : composer ce pack`}>
+            <PackCard pack={pack} />
+          </Link>
+        </li>
+      ))}
+    </ul>
   )
 }

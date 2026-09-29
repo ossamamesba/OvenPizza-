@@ -1,7 +1,9 @@
 import type {
+  AdminPack,
   AdminPizza,
   AdminReservation,
   LoginResponse,
+  PackInput,
   PizzaInput,
   ReservationStatus,
   User,
@@ -29,7 +31,15 @@ export const getReservation = (id: number, signal?: AbortSignal) =>
 export const updateReservationStatus = (id: number, status: ReservationStatus) =>
   apiFetch<AdminReservation>(`/api/admin/reservations/${id}/status`, { method: 'PATCH', body: json({ status }) })
 
-// Menu
+// Packs
+export const listPacks = (signal?: AbortSignal) => apiFetch<AdminPack[]>('/api/admin/packs', { signal })
+export const getPack = (id: number, signal?: AbortSignal) => apiFetch<AdminPack>(`/api/admin/packs/${id}`, { signal })
+export const createPack = (input: PackInput) => apiFetch<AdminPack>('/api/admin/packs', { method: 'POST', body: json(input) })
+export const updatePack = (id: number, input: Partial<PackInput>) =>
+  apiFetch<AdminPack>(`/api/admin/packs/${id}`, { method: 'PATCH', body: json(input) })
+export const deletePack = (id: number) => apiFetch<void>(`/api/admin/packs/${id}`, { method: 'DELETE' })
+
+// Pizzas
 export const listPizzas = (signal?: AbortSignal) => apiFetch<AdminPizza[]>('/api/admin/pizzas', { signal })
 export const getPizza = (id: number, signal?: AbortSignal) => apiFetch<AdminPizza>(`/api/admin/pizzas/${id}`, { signal })
 export const createPizza = (input: PizzaInput) =>

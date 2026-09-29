@@ -46,9 +46,9 @@ export function DashboardPage() {
             <StatTile Icon={Clock} label="Demandes en attente" value={data.pending.length} to="/reservations?status=pending" highlight={data.pending.length > 0} />
             <StatTile
               Icon={CalendarCheck}
-              label="Réservations aujourd'hui"
+              label="Événements aujourd'hui"
               value={data.today.filter((r) => r.status !== 'refused').length}
-              detail={`${data.today.filter((r) => r.status === 'accepted').reduce((sum, r) => sum + r.numberOfPeople, 0)} couverts confirmés`}
+              detail={`${data.today.filter((r) => r.status === 'accepted').reduce((sum, r) => sum + r.totalPizzas, 0)} pizzas confirmées à préparer`}
               to={`/reservations?date=${toIsoDate(new Date())}`}
             />
             <StatTile

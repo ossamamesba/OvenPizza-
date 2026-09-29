@@ -43,6 +43,13 @@ docker compose exec php php bin/console doctrine:fixtures:load -n        # donn�
 
 ## API
 
-- Public : `GET /api/pizzas`, `GET /api/pizzas/{id}`, `POST /api/reservations`
+- Public (site client) :
+  - `GET /api/packs` : packs actifs avec leurs pizzas disponibles
+  - `GET /api/pizzas`, `GET /api/pizzas/{id}`
+  - `POST /api/reservations` : demande pour un événement (pack, pizzas + quantités, date, heure, ville, adresse, tranche d'invités ou nombre exact)
 - Login : `POST /api/login` `{"email", "password"}` → `{"token", "user"}`
-- Patron (en-tête `Authorization: Bearer <token>`) : `/api/admin/me`, `/api/admin/pizzas`, `/api/admin/pizzas/{id}/image` (photo, multipart), `/api/admin/reservations`
+- Patron (en-tête `Authorization: Bearer <token>`) :
+  - `/api/admin/me`
+  - `/api/admin/packs` (prix par pizza, variétés max, visibilité)
+  - `/api/admin/pizzas` (+ `packId`), `/api/admin/pizzas/{id}/image` (photo, multipart)
+  - `/api/admin/reservations`, `/api/admin/reservations/{id}/status`

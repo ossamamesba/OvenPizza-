@@ -30,16 +30,16 @@ final class JsonPayloadMapper
      * @template T of object
      *
      * @param class-string<T>|T $target classe à créer, ou objet existant à mettre à jour
-     * @param list<string>      $groups groupes de sérialisation autorisés en écriture
+     * @param list<string>      $groups groupes de sérialisation autorisés en écriture (vide = toutes les propriétés, pour un DTO)
      *
      * @return T
      */
-    public function map(Request $request, string|object $target, array $groups): object
+    public function map(Request $request, string|object $target, array $groups = []): object
     {
-        $context = [
-            AbstractNormalizer::GROUPS => $groups,
-            DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
-        ];
+        $context = [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true];
+        if ([] !== $groups) {
+            $context[AbstractNormalizer::GROUPS] = $groups;
+        }
         if (\is_object($target)) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $target;
         }
@@ -52,10 +52,12 @@ final class JsonPayloadMapper
         } catch (PartialDenormalizationException $e) {
             $violations = new ConstraintViolationList();
             foreach ($e->getErrors() as $error) {
-                $violations->add(new ConstraintViolation(
-                    'Type invalide (attendu : '.implode(', ', $error->getExpectedTypes() ?? []).').',
-                    null, [], null, (string) $error->getPath(), $error->getCurrentType(),
-                ));
+                $expected = $error->getExpectedTypes() ?? [];
+                // Bon type mais valeur refusée (ex. ville inconnue pour une liste fixe) : message plus clair.
+                $message = \in_array($error->getCurrentType(), $expected, true)
+                    ? 'Valeur non autorisée.'
+                    : 'Type invalide (attendu : '.implode(', ', $expected).').';
+                $violations->add(new ConstraintViolation($message, null, [], null, (string) $error->getPath(), $error->getCurrentType()));
             }
             throw new ValidationFailedException($e->getData(), $violations);
         }

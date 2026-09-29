@@ -1,7 +1,8 @@
 import { useCallback, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Phone } from 'lucide-react'
-import { formatDate } from '@shared/lib/format'
+import { ArrowLeft, ExternalLink, Phone } from 'lucide-react'
+import { formatDate, formatPrice } from '@shared/lib/format'
+import { cityLabel, guestsLabel } from '@shared/lib/labels'
 import { getReservation } from '../api/admin'
 import { useAsync } from '../hooks/useAsync'
 import { PageTitle } from '../components/PageTitle'
@@ -34,10 +35,53 @@ export function ReservationDetailPage() {
             <dl className="grid gap-5 sm:grid-cols-2">
               <Item label="Date"><span className="first-letter:uppercase">{formatDate(reservation.date)}</span></Item>
               <Item label="Heure"><span className="tabular-nums">{reservation.time}</span></Item>
-              <Item label="Nombre de personnes">{reservation.numberOfPeople}</Item>
+              <Item label="Invités">{guestsLabel(reservation)}</Item>
               <Item label="Téléphone">{reservation.phone}</Item>
+              <Item label="Ville">{cityLabel(reservation.city)}</Item>
+              <Item label="Adresse">
+                {reservation.address ? (
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${reservation.address}, ${cityLabel(reservation.city)}`)}`}
+                    target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-primary hover:underline">
+                    {reservation.address} <ExternalLink className="size-4" aria-hidden="true" />
+                  </a>
+                ) : '—'}
+              </Item>
               <Item label="Demande reçue le">{dateTime.format(new Date(reservation.createdAt))}</Item>
             </dl>
+
+            {reservation.items.length > 0 && (
+              <div className="mt-8 border-t border-border pt-6">
+                <h2 className="text-xl font-bold">{reservation.packName} <span className="font-sans text-base font-semibold text-muted">· {reservation.packPrice && formatPrice(reservation.packPrice)} / pizza</span></h2>
+                <table className="mt-3 w-full text-left">
+                  <caption className="sr-only">Pizzas commandées</caption>
+                  <thead className="text-sm text-muted">
+                    <tr><th scope="col" className="py-2 font-semibold">Pizza</th><th scope="col" className="py-2 text-right font-semibold">Quantité</th></tr>
+                  </thead>
+                  <tbody>
+                    {reservation.items.map((item) => (
+                      <tr key={item.pizzaName} className="border-t border-border">
+                        <td className="py-2.5 font-semibold">{item.pizzaName}</td>
+                        <td className="py-2.5 text-right text-lg font-bold tabular-nums">{item.quantity}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-foreground">
+                      <th scope="row" className="py-2.5">Total : {reservation.totalPizzas} pizzas</th>
+                      <td className="py-2.5 text-right font-display text-2xl font-bold tabular-nums">{reservation.estimatedTotal && `≈ ${formatPrice(reservation.estimatedTotal)}`}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+
+            {reservation.notes && (
+              <div className="mt-6 rounded-xl bg-accent-soft p-4">
+                <p className="text-sm font-semibold text-muted">Message du client</p>
+                <p className="mt-1 whitespace-pre-line">{reservation.notes}</p>
+              </div>
+            )}
+
             <div className="mt-8 flex flex-wrap items-start gap-3 border-t border-border pt-6">
               <a href={`tel:${reservation.phone.replace(/\s/g, '')}`} className={buttonClass('secondary')}>
                 <Phone className="size-4" aria-hidden="true" /> Appeler le client

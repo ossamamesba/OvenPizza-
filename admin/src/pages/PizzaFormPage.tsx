@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ImagePlus, Trash2 } from 'lucide-react'
-import type { AdminPizza, PizzaInput } from '@shared/api/types'
-import { createPizza, deletePizzaImage, getPizza, updatePizza, uploadPizzaImage } from '../api/admin'
+import type { AdminPack, AdminPizza, PizzaInput } from '@shared/api/types'
+import { createPizza, deletePizzaImage, getPizza, listPacks, updatePizza, uploadPizzaImage } from '../api/admin'
+import { formatPrice } from '@shared/lib/format'
 import { useAsync } from '../hooks/useAsync'
 import { ApiError } from '../lib/api'
 import { PageTitle } from '../components/PageTitle'
@@ -12,7 +13,7 @@ import { ErrorState } from '../components/ui/ErrorState'
 import { Spinner } from '../components/ui/Spinner'
 import { Switch } from '../components/ui/Switch'
 
-type Field = 'name' | 'description' | 'price' | 'image'
+type Field = 'name' | 'description' | 'packId' | 'image'
 type Errors = Partial<Record<Field, string>>
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -23,7 +24,13 @@ const inputClass = (invalid: boolean) =>
 export function PizzaFormPage() {
   const { id } = useParams()
   const pizzaId = id ? Number(id) : null
-  const load = useCallback((signal: AbortSignal) => (pizzaId ? getPizza(pizzaId, signal) : Promise.resolve(null)), [pizzaId])
+  const load = useCallback(
+    async (signal: AbortSignal) => {
+      const [pizza, packs] = await Promise.all([pizzaId ? getPizza(pizzaId, signal) : Promise.resolve(null), listPacks(signal)])
+      return { pizza, packs }
+    },
+    [pizzaId],
+  )
   const { data, error, loading, reload } = useAsync(load)
 
   return (
@@ -34,18 +41,18 @@ export function PizzaFormPage() {
       <PageTitle title={pizzaId ? 'Modifier la pizza' : 'Ajouter une pizza'} />
       {error && <ErrorState message={error} onRetry={reload} />}
       {loading && <Spinner />}
-      {!loading && !error && <PizzaForm key={data?.id ?? 'new'} pizza={data ?? null} />}
+      {!loading && !error && data && <PizzaForm key={data.pizza?.id ?? 'new'} pizza={data.pizza} packs={data.packs} />}
     </>
   )
 }
 
-function PizzaForm({ pizza }: { pizza: AdminPizza | null }) {
+function PizzaForm({ pizza, packs }: { pizza: AdminPizza | null; packs: AdminPack[] }) {
   const navigate = useNavigate()
   const [form, setForm] = useState<PizzaInput>({
     name: pizza?.name ?? '',
     description: pizza?.description ?? '',
-    price: pizza?.price ?? '',
     isAvailable: pizza?.isAvailable ?? true,
+    packId: pizza ? pizza.packId : (packs[0]?.id ?? null),
   })
   const [image, setImage] = useState<string | null>(pizza?.image ?? null)
   const [file, setFile] = useState<File | null>(null)
@@ -83,7 +90,6 @@ function PizzaForm({ pizza }: { pizza: AdminPizza | null }) {
   function validate(): Errors {
     const e: Errors = {}
     if (!form.name.trim()) e.name = 'Indiquez le nom de la pizza.'
-    if (!/^\d{1,6}([.,]\d{1,2})?$/.test(String(form.price).trim())) e.price = 'Prix invalide (ex. 45 ou 45,50).'
     return e
   }
 
@@ -98,8 +104,8 @@ function PizzaForm({ pizza }: { pizza: AdminPizza | null }) {
     const input: PizzaInput = {
       name: form.name.trim(),
       description: form.description?.trim() || null,
-      price: String(form.price).trim().replace(',', '.'),
       isAvailable: form.isAvailable,
+      packId: form.packId,
     }
     try {
       let saved = pizza ? await updatePizza(pizza.id, input) : await createPizza(input)
@@ -139,11 +145,17 @@ function PizzaForm({ pizza }: { pizza: AdminPizza | null }) {
             onChange={(e) => update('description', e.target.value)} className={`${inputClass(false)} py-3`} />
           <p id="description-help" className="mt-1.5 text-sm text-muted">Les ingrédients principaux, affichés sur le site.</p>
         </div>
-        <div className="max-w-xs">
-          <label htmlFor="price" className="font-semibold">Prix (DH) <span aria-hidden="true" className="text-danger">*</span></label>
-          <input id="price" type="text" inputMode="decimal" required value={form.price} aria-invalid={!!errors.price || undefined} aria-describedby={describedBy('price')}
-            onChange={(e) => update('price', e.target.value)} className={inputClass(!!errors.price)} />
-          {fieldError('price')}
+        <div className="max-w-sm">
+          <label htmlFor="packId" className="font-semibold">Pack</label>
+          <select id="packId" value={form.packId ?? ''} aria-invalid={!!errors.packId || undefined} aria-describedby={describedBy('packId') ?? 'packId-help'}
+            onChange={(e) => update('packId', e.target.value ? Number(e.target.value) : null)} className={inputClass(!!errors.packId)}>
+            {packs.map((pack) => (
+              <option key={pack.id} value={pack.id}>{pack.name} ({formatPrice(pack.price)} / pizza)</option>
+            ))}
+            <option value="">Aucun pack (non proposée aux clients)</option>
+          </select>
+          <p id="packId-help" className="mt-1.5 text-sm text-muted">Le prix de la pizza est celui de son pack.</p>
+          {fieldError('packId')}
         </div>
         <Switch checked={form.isAvailable} onChange={(v) => update('isAvailable', v)} label="Disponible sur le site" showLabel />
       </div>
