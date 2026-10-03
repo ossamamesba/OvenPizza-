@@ -6,10 +6,13 @@ import { InstagramSection } from '../components/InstagramSection'
 import { LogoMark } from '../components/Logo'
 import { LoadError } from '../components/LoadError'
 import { PackCard } from '../components/PackCard'
+import { PizzaCard } from '../components/PizzaCard'
 import { phoneHref, restaurant, whatsappHref } from '../config/restaurant'
 import { usePacks } from '../hooks/usePacks'
 
 export function HomePage() {
+  // Une seule requête pour les packs et leurs pizzas, partagée par les deux sections.
+  const packs = usePacks()
   return (
     <>
       <title>{`${restaurant.name} — Pizza party à domicile, ${restaurant.zones.join(' & ')}`}</title>
@@ -87,7 +90,21 @@ export function HomePage() {
             Composer mon pack <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
-        <PacksPreview />
+        <PacksPreview {...packs} />
+      </section>
+
+      {/* Toutes les pizzas proposées, avec leur description */}
+      <section className="container-page mt-20" aria-labelledby="pizzas-title">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 id="pizzas-title" className="text-3xl font-bold md:text-4xl">Nos pizzas</h2>
+            <p className="mt-2 text-muted">Pâte pétrie maison, ingrédients frais, cuites devant vos invités.</p>
+          </div>
+          <Link to="/packs" className="inline-flex min-h-11 items-center gap-1 font-semibold text-primary hover:underline">
+            Choisir mes pizzas <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+        <PizzasPreview {...packs} />
       </section>
 
       {/* Savoir-faire : le côté humain */}
@@ -153,8 +170,9 @@ export function HomePage() {
   )
 }
 
-function PacksPreview() {
-  const { state, retry } = usePacks()
+type PacksResult = ReturnType<typeof usePacks>
+
+function PacksPreview({ state, retry }: PacksResult) {
   if (state.status === 'loading') return <p role="status" className="py-8 text-center text-muted">Chargement des packs…</p>
   if (state.status === 'error') return <LoadError message={state.message} onRetry={retry} />
   return (
@@ -164,6 +182,21 @@ function PacksPreview() {
           <Link to="/packs" className="block h-full rounded-card focus-visible:outline-3" aria-label={`${pack.name} : composer ce pack`}>
             <PackCard pack={pack} />
           </Link>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function PizzasPreview({ state }: PacksResult) {
+  // Chargement et erreur déjà affichés par la section « Nos packs ».
+  if (state.status !== 'success') return null
+  const pizzas = state.packs.flatMap((pack) => pack.pizzas.map((pizza) => ({ pizza, packName: pack.name })))
+  return (
+    <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {pizzas.map(({ pizza, packName }) => (
+        <li key={pizza.id}>
+          <PizzaCard pizza={pizza} packName={packName} />
         </li>
       ))}
     </ul>
