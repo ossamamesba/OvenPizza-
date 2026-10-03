@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { CalendarCheck, LayoutDashboard, LogOut, Pizza } from 'lucide-react'
+import { CalendarCheck, LayoutDashboard, LogOut, Package, Pizza } from 'lucide-react'
 import { useAuth } from '../../auth/useAuth'
 
 const links = [
   { to: '/', label: 'Tableau de bord', short: 'Accueil', Icon: LayoutDashboard },
   { to: '/reservations', label: 'Réservations', short: 'Réservations', Icon: CalendarCheck },
-  { to: '/menu', label: 'Menu', short: 'Menu', Icon: Pizza },
+  { to: '/packs', label: 'Packs', short: 'Packs', Icon: Package },
+  { to: '/menu', label: 'Pizzas', short: 'Pizzas', Icon: Pizza },
 ]
 
 /** Ordinateur : barre latérale. Téléphone : barre du haut + navigation en bas de l'écran. */
@@ -76,7 +77,7 @@ export function AdminLayout() {
 
       {/* Navigation du bas (téléphone / tablette) */}
       <nav aria-label="Navigation du dashboard" className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden">
-        <ul className="grid grid-cols-3">
+        <ul className="grid grid-cols-4">
           {links.map(({ to, short, Icon }) => (
             <li key={to}>
               <NavLink

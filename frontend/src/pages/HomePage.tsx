@@ -1,6 +1,8 @@
 import { ArrowRight, ChefHat, Flame, Leaf, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ButtonLink } from '../components/ButtonLink'
+import { Eyebrow } from '../components/Eyebrow'
+import { InstagramSection } from '../components/InstagramSection'
 import { LogoMark } from '../components/Logo'
 import { LoadError } from '../components/LoadError'
 import { PackCard } from '../components/PackCard'
@@ -16,12 +18,13 @@ export function HomePage() {
       <section className="overflow-hidden">
         <div className="container-page grid items-center gap-10 py-12 md:grid-cols-2 md:py-20">
           <div>
-            <p className="mb-4 inline-block rounded-full bg-accent-soft px-4 py-1.5 font-semibold text-accent">
-              {restaurant.zones.join(' · ')}
-            </p>
+            <div className="mb-5">
+              <Eyebrow>{restaurant.zones.join(' · ')}</Eyebrow>
+            </div>
             <h1 className="text-5xl font-bold md:text-6xl lg:text-7xl">
               La pizza party vient <span className="text-primary">chez vous.</span>
             </h1>
+            <p className="mt-2 -rotate-2 font-script text-4xl text-basil md:text-5xl" aria-hidden="true">Italian Pizza</p>
             <p className="mt-5 max-w-lg text-lg text-muted md:text-xl">{restaurant.tagline}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ButtonLink to="/packs">Découvrir nos packs</ButtonLink>
@@ -102,7 +105,7 @@ export function HomePage() {
             <figcaption className="mt-3 text-center font-display text-lg italic text-muted">Le dernier geste, juste avant de servir.</figcaption>
           </figure>
           <div>
-            <p className="font-semibold uppercase tracking-wider text-accent">Notre savoir-faire</p>
+            <Eyebrow>Notre savoir-faire</Eyebrow>
             <h2 id="story-title" className="mt-2 text-3xl font-bold md:text-4xl">Fait main, cuit devant vous.</h2>
             <p className="mt-4 text-lg text-muted">
               Anniversaires, mariages, soirées privées ou événements d'entreprise : nous installons notre stand et notre four
@@ -115,7 +118,7 @@ export function HomePage() {
                 { Icon: Flame, title: 'Cuite à la minute', text: 'Sortie du four et servie aussitôt, bien chaude.' },
               ].map(({ Icon, title, text }) => (
                 <li key={title} className="flex gap-4">
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-primary">
+                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-basil-soft text-basil">
                     <Icon className="size-6" aria-hidden="true" />
                   </span>
                   <span>
@@ -128,6 +131,8 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      <InstagramSection />
 
       {/* Appel à réserver */}
       <section className="container-page mt-20">

@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
-import type { AdminPack, AdminPizza } from '@shared/api/types'
-import { formatPrice } from '@shared/lib/format'
+import type { AdminPizza } from '@shared/api/types'
 import { deletePizza, listPacks, listPizzas, updatePizza } from '../api/admin'
 import { useAsync } from '../hooks/useAsync'
 import { ApiError } from '../lib/api'
@@ -59,7 +58,7 @@ export function MenuPage() {
 
   return (
     <>
-      <PageTitle title="Menu" subtitle="Packs, prix et pizzas : les changements sont visibles immédiatement sur le site." />
+      <PageTitle title="Pizzas" subtitle="Toutes les pizzas, rangées par pack. Les changements sont visibles immédiatement sur le site." />
 
       <div aria-live="polite">
         {message && (
@@ -74,25 +73,9 @@ export function MenuPage() {
 
       {data && (
         <>
-          <section aria-labelledby="packs-title" className="mb-10">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 id="packs-title" className="text-2xl font-bold">Packs</h2>
-              <Link to="/menu/packs/new" className={buttonClass('secondary', 'sm')}>
-                <Plus className="size-4" aria-hidden="true" /> Ajouter un pack
-              </Link>
-            </div>
-            {data.packs.length === 0 ? (
-              <EmptyState>Aucun pack. Créez-en un pour proposer vos pizzas aux clients.</EmptyState>
-            ) : (
-              <ul className="grid gap-4 sm:grid-cols-2">
-                {data.packs.map((pack) => <PackTile key={pack.id} pack={pack} />)}
-              </ul>
-            )}
-          </section>
-
           <section aria-labelledby="pizzas-title">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 id="pizzas-title" className="text-2xl font-bold">Pizzas</h2>
+            <div className="mb-4 flex flex-wrap items-center justify-end gap-3">
+              <h2 id="pizzas-title" className="sr-only">Liste des pizzas</h2>
               <Link to="/menu/new" className={buttonClass('primary', 'sm')}>
                 <Plus className="size-4" aria-hidden="true" /> Ajouter une pizza
               </Link>
@@ -155,24 +138,5 @@ export function MenuPage() {
         onCancel={() => setToDelete(null)}
       />
     </>
-  )
-}
-
-function PackTile({ pack }: { pack: AdminPack }) {
-  return (
-    <li>
-      <Link to={`/menu/packs/${pack.id}`} className="block rounded-card bg-surface p-5 shadow-card ring-1 ring-border transition-colors hover:ring-primary/40">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-xl font-bold">{pack.name}</p>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${pack.isActive ? 'bg-success-soft text-success' : 'bg-foreground/10 text-muted'}`}>
-            {pack.isActive ? 'Visible' : 'Masqué'}
-          </span>
-        </div>
-        <p className="mt-2 font-display text-3xl font-bold text-primary tabular-nums">
-          {formatPrice(pack.price)} <span className="font-sans text-sm font-semibold text-muted">/ pizza</span>
-        </p>
-        <p className="mt-1 text-sm text-muted">{pack.pizzaCount} pizzas · {pack.maxVarieties} variétés max · <span className="font-semibold text-foreground">Modifier</span></p>
-      </Link>
-    </li>
   )
 }

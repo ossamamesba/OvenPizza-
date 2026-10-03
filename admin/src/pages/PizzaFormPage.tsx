@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, ImagePlus, Trash2 } from 'lucide-react'
 import type { AdminPack, AdminPizza, PizzaInput } from '@shared/api/types'
 import { createPizza, deletePizzaImage, getPizza, listPacks, updatePizza, uploadPizzaImage } from '../api/admin'
@@ -24,6 +24,7 @@ const inputClass = (invalid: boolean) =>
 export function PizzaFormPage() {
   const { id } = useParams()
   const pizzaId = id ? Number(id) : null
+  const presetPackId = Number(useSearchParams()[0].get('packId')) || null
   const load = useCallback(
     async (signal: AbortSignal) => {
       const [pizza, packs] = await Promise.all([pizzaId ? getPizza(pizzaId, signal) : Promise.resolve(null), listPacks(signal)])
@@ -36,23 +37,23 @@ export function PizzaFormPage() {
   return (
     <>
       <Link to="/menu" className="mb-4 inline-flex min-h-11 items-center gap-1 font-semibold text-muted hover:text-foreground">
-        <ArrowLeft className="size-4" aria-hidden="true" /> Menu
+        <ArrowLeft className="size-4" aria-hidden="true" /> Pizzas
       </Link>
       <PageTitle title={pizzaId ? 'Modifier la pizza' : 'Ajouter une pizza'} />
       {error && <ErrorState message={error} onRetry={reload} />}
       {loading && <Spinner />}
-      {!loading && !error && data && <PizzaForm key={data.pizza?.id ?? 'new'} pizza={data.pizza} packs={data.packs} />}
+      {!loading && !error && data && <PizzaForm key={data.pizza?.id ?? 'new'} pizza={data.pizza} packs={data.packs} presetPackId={presetPackId} />}
     </>
   )
 }
 
-function PizzaForm({ pizza, packs }: { pizza: AdminPizza | null; packs: AdminPack[] }) {
+function PizzaForm({ pizza, packs, presetPackId }: { pizza: AdminPizza | null; packs: AdminPack[]; presetPackId: number | null }) {
   const navigate = useNavigate()
   const [form, setForm] = useState<PizzaInput>({
     name: pizza?.name ?? '',
     description: pizza?.description ?? '',
     isAvailable: pizza?.isAvailable ?? true,
-    packId: pizza ? pizza.packId : (packs[0]?.id ?? null),
+    packId: pizza ? pizza.packId : (packs.find((p) => p.id === presetPackId)?.id ?? packs[0]?.id ?? null),
   })
   const [image, setImage] = useState<string | null>(pizza?.image ?? null)
   const [file, setFile] = useState<File | null>(null)

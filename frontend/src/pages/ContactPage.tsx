@@ -21,7 +21,7 @@ export function ContactPage() {
   return (
     <>
       <title>{`Contact — ${restaurant.name}`}</title>
-      <PageHeader title="Contact" intro={`${restaurant.name} accompagne vos fêtes et événements à ${restaurant.zones.join(' et ')}.`} />
+      <PageHeader title="Contact" eyebrow="Parlons de votre événement" intro={`${restaurant.name} accompagne vos fêtes et événements à ${restaurant.zones.join(' et ')}.`} />
       <div className="container-page grid gap-6 lg:grid-cols-2">
         <ul className="grid gap-4">
           {links.map(({ Icon, label, value, href, external }) => (

@@ -23,6 +23,7 @@ export function PacksPage() {
       <title>{`Nos packs — ${restaurant.name}`}</title>
       <PageHeader
         title="Nos packs"
+        eyebrow="Pizza party à domicile"
         intro={`Choisissez votre pack, puis vos pizzas et leurs quantités. Nous venons les préparer sur place, à ${restaurant.zones.join(' et ')}.`}
       />
 

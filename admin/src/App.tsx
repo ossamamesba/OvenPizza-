@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage'
 import { MenuPage } from './pages/MenuPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PackFormPage } from './pages/PackFormPage'
+import { PacksPage } from './pages/PacksPage'
 import { PizzaFormPage } from './pages/PizzaFormPage'
 import { ReservationDetailPage } from './pages/ReservationDetailPage'
 import { ReservationsPage } from './pages/ReservationsPage'
@@ -25,8 +26,9 @@ export default function App() {
               <Route path="menu" element={<MenuPage />} />
               <Route path="menu/new" element={<PizzaFormPage />} />
               <Route path="menu/:id" element={<PizzaFormPage />} />
-              <Route path="menu/packs/new" element={<PackFormPage />} />
-              <Route path="menu/packs/:id" element={<PackFormPage />} />
+              <Route path="packs" element={<PacksPage />} />
+              <Route path="packs/new" element={<PackFormPage />} />
+              <Route path="packs/:id" element={<PackFormPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Route>

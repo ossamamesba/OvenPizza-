@@ -18,7 +18,7 @@ type Errors = Partial<Record<Field, string>>
 const inputClass = (invalid: boolean) =>
   `mt-1.5 block min-h-12 w-full rounded-xl border bg-surface px-4 text-base ${invalid ? 'border-danger' : 'border-border'} focus:border-primary`
 
-/** /menu/packs/new : ajout — /menu/packs/:id : modification (nom, prix par pizza, variétés, visibilité). */
+/** /packs/new : ajout — /packs/:id : modification (nom, prix par pizza, variétés, visibilité). */
 export function PackFormPage() {
   const { id } = useParams()
   const packId = id ? Number(id) : null
@@ -27,8 +27,8 @@ export function PackFormPage() {
 
   return (
     <>
-      <Link to="/menu" className="mb-4 inline-flex min-h-11 items-center gap-1 font-semibold text-muted hover:text-foreground">
-        <ArrowLeft className="size-4" aria-hidden="true" /> Menu
+      <Link to="/packs" className="mb-4 inline-flex min-h-11 items-center gap-1 font-semibold text-muted hover:text-foreground">
+        <ArrowLeft className="size-4" aria-hidden="true" /> Packs
       </Link>
       <PageTitle title={packId ? 'Modifier le pack' : 'Ajouter un pack'} />
       {error && <ErrorState message={error} onRetry={reload} />}
@@ -81,7 +81,7 @@ function PackForm({ pack }: { pack: AdminPack | null }) {
     try {
       if (pack) await updatePack(pack.id, input)
       else await createPack(input)
-      navigate('/menu', { replace: true })
+      navigate('/packs', { replace: true })
     } catch (err) {
       if (err instanceof ApiError && Object.keys(err.violations).length > 0) {
         setErrors(Object.fromEntries(Object.entries(err.violations).map(([field, messages]) => [field, messages[0]])))
@@ -97,7 +97,7 @@ function PackForm({ pack }: { pack: AdminPack | null }) {
     setDeleting(true)
     try {
       await deletePack(pack.id)
-      navigate('/menu', { replace: true })
+      navigate('/packs', { replace: true })
     } catch (err) {
       setFormError(err instanceof ApiError ? err.message : 'Suppression impossible.')
       setConfirmDelete(false)
