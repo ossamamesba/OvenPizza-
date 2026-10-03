@@ -6,6 +6,7 @@ import { InstagramSection } from '../components/InstagramSection'
 import { LogoMark } from '../components/Logo'
 import { LoadError } from '../components/LoadError'
 import { PackCard } from '../components/PackCard'
+import { HorizontalScroller } from '../components/HorizontalScroller'
 import { PizzaCard } from '../components/PizzaCard'
 import { phoneHref, restaurant, whatsappHref } from '../config/restaurant'
 import { usePacks } from '../hooks/usePacks'
@@ -98,7 +99,7 @@ export function HomePage() {
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 id="pizzas-title" className="text-3xl font-bold md:text-4xl">Nos pizzas</h2>
-            <p className="mt-2 text-muted">Pâte pétrie maison, ingrédients frais, cuites devant vos invités.</p>
+            <p className="mt-2 text-muted">Pâte pétrie maison, ingrédients frais, cuites devant vos invités. Faites défiler pour toutes les voir.</p>
           </div>
           <Link to="/packs" className="inline-flex min-h-11 items-center gap-1 font-semibold text-primary hover:underline">
             Choisir mes pizzas <ArrowRight className="size-4" aria-hidden="true" />
@@ -193,12 +194,12 @@ function PizzasPreview({ state }: PacksResult) {
   if (state.status !== 'success') return null
   const pizzas = state.packs.flatMap((pack) => pack.pizzas.map((pizza) => ({ pizza, packName: pack.name })))
   return (
-    <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <HorizontalScroller label="Liste des pizzas, défilement horizontal">
       {pizzas.map(({ pizza, packName }) => (
-        <li key={pizza.id}>
+        <li key={pizza.id} className="w-[72vw] max-w-72 shrink-0 snap-start sm:w-72">
           <PizzaCard pizza={pizza} packName={packName} />
         </li>
       ))}
-    </ul>
+    </HorizontalScroller>
   )
 }
