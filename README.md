@@ -9,8 +9,8 @@ backend/   API Symfony 7.4 (PHP 8.3, Doctrine, MySQL)
 docker/    Configuration des conteneurs PHP et Nginx
 frontend/  Site client React + TypeScript (PWA)
 admin/     Dashboard web du patron React + TypeScript
+mobile/    App Android du patron (Expo + React Native) — voir mobile/README.md
 shared/    Code commun : types de l'API, client HTTP, formatage, thème
-mobile/    Application du patron React Native (Expo)   — à venir
 ```
 
 ## Démarrage (Docker, WSL recommandé)

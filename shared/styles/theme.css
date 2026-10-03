@@ -5,6 +5,7 @@
  * Rouge tomate + or « croûte dorée » + vert basilic (touche italienne du logo) sur fond crème.
  * Contrastes vérifiés ≥ 4.5:1.
  * Utiliser ces tokens (bg-primary, text-muted…) plutôt que des couleurs brutes.
+ * ⚠️ Mêmes valeurs que shared/theme/tokens.ts (app mobile) : modifier les deux ensemble.
  */
 @theme {
   --color-primary: #c62828;

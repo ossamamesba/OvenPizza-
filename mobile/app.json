@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Oven's Patron",
+    "slug": "ovens-pizza-patron",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ma.ovenspizza.patron"
+    },
+    "android": {
+      "package": "ma.ovenspizza.patron",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF8F0",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "backgroundColor": "#FFF8F0"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "L'app accède à vos photos pour ajouter la photo d'une pizza."
+        }
+      ]
+    ],
+    "scheme": "ovenspatron",
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
