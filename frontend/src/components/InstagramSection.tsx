@@ -7,9 +7,9 @@ const PHOTOS = [
   { src: '/images/insta/stand-jour.webp', alt: 'Le pizzaïolo garnit une pizza au stand, en plein jour' },
   { src: '/images/insta/stand-nuit.webp', alt: 'Le stand Oven’s Pizza Party illuminé lors d’une soirée' },
   { src: '/images/insta/finition.webp', alt: 'Finition d’une pizza pepperoni avec un filet de crème balsamique' },
-  { src: '/images/insta/quatre-fromages.webp', alt: 'Pizza quatre fromages' },
-  { src: '/images/insta/burrata.webp', alt: 'Pizza burrata, tomates cerises et roquette' },
-  { src: '/images/insta/margherita.webp', alt: 'Pizza margherita au basilic frais' },
+  { src: '/images/insta/four.webp', alt: 'Four à pizza portable, une pizza en cuisson' },
+  { src: '/images/insta/four-margherita.webp', alt: 'Pizza margherita devant le four à pizza' },
+  { src: '/images/insta/salon.webp', alt: 'Démonstration de pizza devant le public lors d’un salon professionnel' },
 ]
 
 export function InstagramSection() {
