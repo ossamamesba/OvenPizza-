@@ -1,0 +1,7 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\Entity\RefreshToken
+    # 30 jours ; chaque utilisation donne un nouveau jeton (usage unique) et relance la durée.
+    ttl: 2592000
+    single_use: true
+    # Nom du champ dans la réponse du login et dans la requête de renouvellement : {"refreshToken": "..."}
+    token_parameter_name: refreshToken

@@ -120,6 +120,8 @@ export interface User {
 
 export interface LoginResponse {
   token: string
+  /** Jeton de renouvellement (30 jours, usage unique) : POST /api/token/refresh {"refreshToken"}. */
+  refreshToken: string
   user: User
 }
 

@@ -3,6 +3,8 @@
 namespace App\EventSubscriber;
 
 use App\Entity\User;
+use Gesdinet\JWTRefreshTokenBundle\Event\RefreshAuthenticationFailureEvent;
+use Gesdinet\JWTRefreshTokenBundle\Event\RefreshTokenNotFoundEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
@@ -32,6 +34,9 @@ final class JwtEventSubscriber implements EventSubscriberInterface
             Events::JWT_NOT_FOUND => 'onJwtNotFound',
             Events::JWT_INVALID => 'onJwtInvalid',
             Events::JWT_EXPIRED => 'onJwtExpired',
+            // Renouvellement du jeton (app mobile) refusé : jeton absent, inconnu, expiré ou déjà utilisé.
+            'gesdinet.refresh_token_failure' => 'onRefreshFailure',
+            'gesdinet.refresh_token_not_found' => 'onRefreshFailure',
         ];
     }
 
@@ -47,7 +52,9 @@ final class JwtEventSubscriber implements EventSubscriberInterface
 
     public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
-        $event->setResponse($this->error('Email ou mot de passe incorrect.'));
+        // Même événement pour le login et le renouvellement du jeton (app mobile) : message adapté.
+        $isRefresh = str_ends_with((string) $event->getRequest()?->getPathInfo(), '/token/refresh');
+        $event->setResponse($this->error($isRefresh ? 'Session expirée, reconnectez-vous.' : 'Email ou mot de passe incorrect.'));
     }
 
     public function onJwtNotFound(JWTNotFoundEvent $event): void
@@ -61,6 +68,11 @@ final class JwtEventSubscriber implements EventSubscriberInterface
     }
 
     public function onJwtExpired(JWTExpiredEvent $event): void
+    {
+        $event->setResponse($this->error('Session expirée, reconnectez-vous.'));
+    }
+
+    public function onRefreshFailure(RefreshAuthenticationFailureEvent|RefreshTokenNotFoundEvent $event): void
     {
         $event->setResponse($this->error('Session expirée, reconnectez-vous.'));
     }

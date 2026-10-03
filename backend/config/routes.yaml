@@ -14,3 +14,8 @@ controllers:
 api_login:
     path: /api/login
     methods: [POST]
+
+# Géré par l'authentificateur « refresh_jwt » du pare-feu « api » : {"refreshToken": "..."} → nouveau jeton.
+api_refresh_token:
+    path: /api/token/refresh
+    methods: [POST]

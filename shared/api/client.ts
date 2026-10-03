@@ -35,7 +35,8 @@ export function createApiClient({ baseUrl = '', getToken, onUnauthorized }: ApiC
     try {
       response = await fetch(`${baseUrl}${path}`, { ...init, headers })
     } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') throw error
+      // Requête annulée (changement d'écran) : on laisse passer. (Pas de DOMException en React Native.)
+      if (error instanceof Error && error.name === 'AbortError') throw error
       throw new ApiError(0, { error: 'Connexion impossible. Vérifiez votre connexion internet.' })
     }
 

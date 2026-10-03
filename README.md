@@ -47,7 +47,8 @@ docker compose exec php php bin/console doctrine:fixtures:load -n        # donn�
   - `GET /api/packs` : packs actifs avec leurs pizzas disponibles
   - `GET /api/pizzas`, `GET /api/pizzas/{id}`
   - `POST /api/reservations` : demande pour un événement (pack, pizzas + quantités, date, heure, ville, adresse, tranche d'invités ou nombre exact)
-- Login : `POST /api/login` `{"email", "password"}` → `{"token", "user"}`
+- Login : `POST /api/login` `{"email", "password"}` → `{"token", "refreshToken", "user"}`
+- Renouvellement : `POST /api/token/refresh` `{"refreshToken"}` → nouveau `token` + nouveau `refreshToken` (usage unique, 30 jours)
 - Patron (en-tête `Authorization: Bearer <token>`) :
   - `/api/admin/me`
   - `/api/admin/packs` (prix par pizza, variétés max, visibilité)

@@ -33,11 +33,16 @@ security:
             pattern: ^/api
             stateless: true
             provider: app_user_provider
+            # Visiteur non connecté : réponse 401 du JWT (« Authentification requise. »)
+            entry_point: jwt
             jwt: ~
+            # Renouvellement du jeton (app mobile) sans redemander le mot de passe
+            refresh_jwt:
+                check_path: /api/token/refresh
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/(login|token/refresh)$, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin, roles: ROLE_ADMIN }
 
 when@test:
