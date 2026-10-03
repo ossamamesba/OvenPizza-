@@ -86,7 +86,7 @@ function ReservationList({ status, date }: { status: ReservationStatus | ''; dat
     (signal: AbortSignal) => listReservations({ status: status || undefined, date: date || undefined }, signal),
     [status, date],
   )
-  const { data, error, loading, reload, setData } = useAsync(load)
+  const { data, error, loading, reload, setData } = useAsync(load, `reservations:${status}:${date}`)
 
   const onUpdated = (updated: AdminReservation) =>
     setData((list) =>

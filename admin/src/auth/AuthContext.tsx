@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { getMe, login as loginRequest } from '../api/admin'
-import { setUnauthorizedHandler, tokenStorage } from '../lib/api'
+import { ApiError, setUnauthorizedHandler, tokenStorage } from '../lib/api'
 
 import { AuthContext, type AuthState } from './context'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Avec un jeton enregistré, on vérifie d'abord qu'il est encore valide (GET /api/admin/me).
-  const [state, setState] = useState<AuthState>(() => (tokenStorage.get() ? { status: 'checking' } : { status: 'anonymous' }))
+  // Session connue : dashboard affiché tout de suite, jeton vérifié en arrière-plan (GET /api/admin/me).
+  const [state, setState] = useState<AuthState>(() => {
+    if (!tokenStorage.get()) return { status: 'anonymous' }
+    const user = tokenStorage.getUser()
+    return user ? { status: 'authenticated', user } : { status: 'checking' }
+  })
 
   const logout = useCallback(() => {
     tokenStorage.clear()
@@ -18,9 +22,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!tokenStorage.get()) return
     const controller = new AbortController()
     getMe(controller.signal)
-      .then((user) => setState({ status: 'authenticated', user }))
-      .catch(() => {
-        if (!controller.signal.aborted) logout()
+      .then((user) => {
+        tokenStorage.setUser(user)
+        setState({ status: 'authenticated', user })
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return
+        // Jeton refusé (401) : déjà déconnecté par onUnauthorized.
+        if (error instanceof ApiError && error.status === 401) return
+        // Réseau ou serveur indisponible : on garde la session connue ; sans elle, retour à la connexion.
+        if (!tokenStorage.getUser()) logout()
       })
     return () => controller.abort()
   }, [logout])
@@ -29,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     tokenStorage.clear()
     const { token, user } = await loginRequest(email, password)
     tokenStorage.set(token)
+    tokenStorage.setUser(user)
     setState({ status: 'authenticated', user })
   }, [])
 

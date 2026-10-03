@@ -17,7 +17,7 @@ export function PacksPage() {
     const [packs, pizzas] = await Promise.all([listPacks(signal), listPizzas(signal)])
     return { packs, pizzas }
   }, [])
-  const { data, error, loading, reload } = useAsync(load)
+  const { data, error, loading, reload } = useAsync(load, 'packs')
 
   return (
     <>

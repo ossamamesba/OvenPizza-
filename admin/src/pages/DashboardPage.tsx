@@ -22,7 +22,7 @@ export function DashboardPage() {
     },
     [],
   )
-  const { data, error, loading, reload, setData } = useAsync(load)
+  const { data, error, loading, reload, setData } = useAsync(load, 'dashboard')
 
   const replace = (updated: AdminReservation) =>
     setData((d) => ({

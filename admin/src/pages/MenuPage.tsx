@@ -18,7 +18,7 @@ export function MenuPage() {
     const [packs, pizzas] = await Promise.all([listPacks(signal), listPizzas(signal)])
     return { packs, pizzas }
   }, [])
-  const { data, error, loading, reload, setData: setMenu } = useAsync(load)
+  const { data, error, loading, reload, setData: setMenu } = useAsync(load, 'pizzas')
   const pizzas = data?.pizzas
   const setData = (update: (list: AdminPizza[]) => AdminPizza[]) => setMenu((d) => ({ ...d, pizzas: update(d.pizzas) }))
   const [toggling, setToggling] = useState<number | null>(null)

@@ -9,6 +9,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Enregistre les photos des pizzas dans public/uploads/pizzas (servies par Nginx sur /uploads/pizzas/…).
+ *
+ * Cohérence fichiers ↔ base : ces méthodes ne suppriment jamais l'ancienne photo elles-mêmes.
+ * Elles renvoient son nom, et l'appelant appelle deleteFile() APRÈS le flush réussi :
+ * si la base refuse le changement, l'ancienne photo est toujours là.
  */
 final class PizzaImageStorage
 {
@@ -18,24 +22,36 @@ final class PizzaImageStorage
     ) {
     }
 
-    /** Remplace la photo actuelle (l'ancien fichier est supprimé). */
-    public function replace(Pizza $pizza, UploadedFile $file): void
+    /** Pose une nouvelle photo envoyée. Renvoie le nom de l'ancienne photo (à supprimer après le flush). */
+    public function store(Pizza $pizza, UploadedFile $file): ?string
     {
-        $filename = bin2hex(random_bytes(16)).'.'.($file->guessExtension() ?? 'jpg');
+        $filename = $this->newName($file->guessExtension() ?? 'jpg');
         $file->move($this->directory, $filename);
 
-        $this->remove($pizza);
-        $pizza->setImage($filename);
+        return $this->swap($pizza, $filename);
     }
 
-    /** Copie une image existante (ex. photos des données de démo) comme photo de la pizza. */
-    public function storeCopy(Pizza $pizza, string $sourcePath): void
+    /** Copie une image existante (ex. photos des données de démo). Renvoie le nom de l'ancienne photo. */
+    public function storeCopy(Pizza $pizza, string $sourcePath): ?string
     {
-        $filename = bin2hex(random_bytes(16)).'.'.strtolower(pathinfo($sourcePath, \PATHINFO_EXTENSION));
+        $filename = $this->newName(pathinfo($sourcePath, \PATHINFO_EXTENSION));
         $this->filesystem->copy($sourcePath, $this->directory.'/'.$filename);
 
-        $this->remove($pizza);
-        $pizza->setImage($filename);
+        return $this->swap($pizza, $filename);
+    }
+
+    /** Retire la photo de la pizza (sans toucher au fichier). Renvoie le nom du fichier à supprimer après le flush. */
+    public function detach(Pizza $pizza): ?string
+    {
+        return $this->swap($pizza, null);
+    }
+
+    public function deleteFile(?string $filename): void
+    {
+        if (null !== $filename) {
+            // basename() : on ne supprime jamais en dehors du dossier des photos.
+            $this->filesystem->remove($this->directory.'/'.basename($filename));
+        }
     }
 
     /** Supprime toutes les photos (utilisé uniquement par les données de démo, qui repartent de zéro). */
@@ -44,12 +60,16 @@ final class PizzaImageStorage
         $this->filesystem->remove($this->directory);
     }
 
-    public function remove(Pizza $pizza): void
+    private function swap(Pizza $pizza, ?string $filename): ?string
     {
-        if (null !== $pizza->getImage()) {
-            // basename() : on ne supprime jamais en dehors du dossier des photos.
-            $this->filesystem->remove($this->directory.'/'.basename($pizza->getImage()));
-            $pizza->setImage(null);
-        }
+        $previous = $pizza->getImage();
+        $pizza->setImage($filename);
+
+        return $previous;
+    }
+
+    private function newName(string $extension): string
+    {
+        return bin2hex(random_bytes(16)).'.'.strtolower($extension);
     }
 }

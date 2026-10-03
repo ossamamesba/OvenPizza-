@@ -74,9 +74,10 @@ final class PizzaController extends AbstractController
     #[Route('/{id<\d+>}', name: 'delete', methods: ['DELETE'])]
     public function delete(Pizza $pizza): Response
     {
-        $this->images->remove($pizza);
+        $photo = $pizza->getImage();
         $this->em->remove($pizza);
         $this->em->flush();
+        $this->images->deleteFile($photo); // seulement une fois la suppression confirmée par la base
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }
@@ -104,8 +105,14 @@ final class PizzaController extends AbstractController
             throw new ValidationFailedException($file, $violations);
         }
 
-        $this->images->replace($pizza, $file);
-        $this->em->flush();
+        $previous = $this->images->store($pizza, $file);
+        try {
+            $this->em->flush();
+        } catch (\Throwable $e) {
+            $this->images->deleteFile($pizza->getImage()); // la base a refusé : on retire le nouveau fichier
+            throw $e;
+        }
+        $this->images->deleteFile($previous);
 
         return $this->json($pizza, context: self::READ);
     }
@@ -113,8 +120,9 @@ final class PizzaController extends AbstractController
     #[Route('/{id<\d+>}/image', name: 'delete_image', methods: ['DELETE'])]
     public function deleteImage(Pizza $pizza): JsonResponse
     {
-        $this->images->remove($pizza);
+        $previous = $this->images->detach($pizza);
         $this->em->flush();
+        $this->images->deleteFile($previous);
 
         return $this->json($pizza, context: self::READ);
     }

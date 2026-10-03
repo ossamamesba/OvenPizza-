@@ -17,7 +17,7 @@ const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle
 export function ReservationDetailPage() {
   const id = Number(useParams().id)
   const load = useCallback((signal: AbortSignal) => getReservation(id, signal), [id])
-  const { data: reservation, error, loading, reload, setData } = useAsync(load)
+  const { data: reservation, error, loading, reload, setData } = useAsync(load, `reservation:${id}`)
 
   return (
     <>

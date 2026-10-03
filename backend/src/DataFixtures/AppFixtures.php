@@ -59,7 +59,7 @@ class AppFixtures extends Fixture
 
             foreach ($packPizzas as [$name, $description, $photo]) {
                 $pizza = (new Pizza())->setName($name)->setDescription($description)->setPack($pack);
-                $this->images->storeCopy($pizza, $this->photosDir.'/'.$photo);
+                $this->images->storeCopy($pizza, $this->photosDir.'/'.$photo); // pizza neuve : pas d'ancienne photo
                 $manager->persist($pizza);
                 $pizzas[$name] = $pizza;
             }
