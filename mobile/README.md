@@ -2,24 +2,29 @@
 
 Expo (SDK 57) + React Native + TypeScript. Même API que le site et le dashboard.
 
-## Lancer l'app sur le téléphone Android
+## Lancer l'app sur le téléphone Android (Expo Go)
 
+**Une seule fois :**
 1. Sur le téléphone : installer **Expo Go** (Play Store). Téléphone et PC sur le **même Wi-Fi**.
-2. Sur Windows (PowerShell) : `ipconfig` → noter l'**adresse IPv4** du Wi-Fi (ex. `192.168.1.20`).
-3. Autoriser l'API dans le pare-feu Windows (PowerShell **administrateur**, une seule fois) :
+2. Autoriser l'API dans le pare-feu Windows (PowerShell **administrateur**) :
    ```powershell
    New-NetFirewallRule -DisplayName "Ovens API" -Direction Inbound -LocalPort 8090 -Protocol TCP -Action Allow
    ```
-4. Dans WSL :
-   ```bash
-   cd ~/OvenPizza-/mobile
-   echo "EXPO_PUBLIC_API_URL=http://192.168.1.20:8090" > .env.local   # votre IPv4
-   npm install
-   npm run start:tunnel
-   ```
-5. Scanner le QR code affiché avec **Expo Go**.
 
-`--tunnel` est nécessaire sous WSL : le téléphone ne voit pas directement le serveur de développement à l'intérieur de WSL.
+**À chaque fois (dans WSL) :**
+```bash
+cd ~/OvenPizza-
+docker compose up -d          # l'API doit tourner
+cd mobile
+npm install                   # la première fois ou après un git pull
+npm run setup                 # trouve l'IP du PC et crée mobile/.env.local
+npm run start:tunnel          # affiche un QR code
+```
+Scanner le QR code avec **Expo Go**. L'écran de connexion indique **« Serveur joignable »** (vert) si tout va bien.
+
+- `npm run setup` ne trouve pas l'IP : sous Windows, `ipconfig` → adresse IPv4 du Wi-Fi, puis `npm run setup -- 192.168.1.20`.
+- « Serveur injoignable » : Docker lancé ? même Wi-Fi ? règle de pare-feu créée ? bonne IP (elle peut changer d'un jour à l'autre) ?
+- `--tunnel` est nécessaire sous WSL : sans lui, le téléphone ne voit pas le serveur de développement.
 
 ## Vérifications
 

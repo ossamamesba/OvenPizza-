@@ -7,6 +7,7 @@ import { useAuth } from '../src/auth/useAuth'
 import { AppText } from '../src/components/AppText'
 import { Button } from '../src/components/Button'
 import { Card } from '../src/components/Card'
+import { ServerStatus } from '../src/components/ServerStatus'
 import { TextField } from '../src/components/TextField'
 import { colors, space } from '../src/theme'
 
@@ -57,6 +58,7 @@ export default function LoginScreen() {
               </Pressable>
             </View>
             <Button label="Se connecter" loading={submitting} onPress={submit} />
+            <ServerStatus />
           </Card>
         </ScrollView>
       </KeyboardAvoidingView>
