@@ -55,3 +55,8 @@ docker compose exec php php bin/console doctrine:fixtures:load -n        # donn�
   - `/api/admin/pizzas` (+ `packId`), `/api/admin/pizzas/{id}/image` (photo, multipart)
   - `/api/admin/reservations`, `/api/admin/reservations/{id}/status`
   - `PUT|DELETE /api/admin/push-tokens` `{"token"}` : téléphone du patron qui reçoit une notification à chaque nouvelle réservation (voir `mobile/README.md`)
+
+## Mise en ligne
+
+Serveur VPS + Docker + HTTPS automatique : voir **[DEPLOY.md](DEPLOY.md)** (`docker-compose.prod.yml`, `deploy.sh`,
+sauvegardes `scripts/backup.sh`). Catalogue de départ : `php bin/console app:catalog:init` (sans effet si des packs existent).

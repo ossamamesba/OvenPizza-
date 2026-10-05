@@ -1,0 +1,79 @@
+# Mise en ligne (serveur VPS) — voir DEPLOY.md. Ne pas utiliser en développement.
+# Lancé par ./deploy.sh : docker compose -f docker-compose.prod.yml …
+name: ovens-pizza-party
+
+services:
+  # Symfony en mode production (mêmes fichiers que le dépôt Git, configurés par les variables de .env)
+  php:
+    build:
+      context: ./docker/php
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/backend
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: ${APP_SECRET:?APP_SECRET manquant dans .env}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE manquant dans .env}
+      DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD manquant dans .env}@database:3306/${MYSQL_DATABASE:-ovens_pizza}?serverVersion=8.4&charset=utf8mb4
+      DEFAULT_URI: https://${API_DOMAIN:?API_DOMAIN manquant dans .env}
+      CORS_ALLOW_ORIGIN: ^https://(${SITE_DOMAIN}|${ADMIN_DOMAIN})$$
+    depends_on:
+      database:
+        condition: service_healthy
+
+  # Front controller Symfony + photos des pizzas (/uploads), joignable seulement par Caddy
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./backend/public:/var/www/backend/public:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+
+  database:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ovens_pizza}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD manquant dans .env}
+    volumes:
+      - database_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # Seul service ouvert sur Internet : HTTPS automatique (Let's Encrypt) pour les 3 adresses
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?SITE_DOMAIN manquant dans .env}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:?ADMIN_DOMAIN manquant dans .env}
+      API_DOMAIN: ${API_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL manquant dans .env}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./frontend/dist:/srv/site:ro
+      - ./admin/dist:/srv/admin:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - nginx
+
+volumes:
+  database_data:
+  caddy_data:
+  caddy_config:

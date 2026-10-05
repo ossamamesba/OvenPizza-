@@ -27,6 +27,10 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            # Anti « devinette » du mot de passe : 5 essais ratés par email et par adresse IP → 15 min d'attente.
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
 
         # Toute l'API : sans session, authentification par en-tête « Authorization: Bearer <token> »
         api:

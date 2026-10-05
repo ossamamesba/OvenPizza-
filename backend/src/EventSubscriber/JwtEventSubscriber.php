@@ -14,6 +14,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -52,6 +53,12 @@ final class JwtEventSubscriber implements EventSubscriberInterface
 
     public function onAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
+        if ($event->getException() instanceof TooManyLoginAttemptsAuthenticationException) {
+            $event->setResponse($this->error('Trop de tentatives. Réessayez dans 15 minutes.', Response::HTTP_TOO_MANY_REQUESTS));
+
+            return;
+        }
+
         // Même événement pour le login et le renouvellement du jeton (app mobile) : message adapté.
         $isRefresh = str_ends_with((string) $event->getRequest()?->getPathInfo(), '/token/refresh');
         $event->setResponse($this->error($isRefresh ? 'Session expirée, reconnectez-vous.' : 'Email ou mot de passe incorrect.'));
@@ -77,8 +84,8 @@ final class JwtEventSubscriber implements EventSubscriberInterface
         $event->setResponse($this->error('Session expirée, reconnectez-vous.'));
     }
 
-    private function error(string $message): JsonResponse
+    private function error(string $message, int $status = Response::HTTP_UNAUTHORIZED): JsonResponse
     {
-        return new JsonResponse(['error' => $message], Response::HTTP_UNAUTHORIZED);
+        return new JsonResponse(['error' => $message], $status);
     }
 }

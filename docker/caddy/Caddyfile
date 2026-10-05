@@ -1,0 +1,60 @@
+# Les certificats HTTPS sont obtenus et renouvelés automatiquement.
+{
+	email {$ACME_EMAIL}
+}
+
+# /api et /uploads → Symfony (même adresse que le site : pas de CORS)
+(backend) {
+	@backend path /api/* /uploads/*
+	handle @backend {
+		reverse_proxy nginx:80
+	}
+}
+
+# Application React compilée : fichiers versionnés gardés 1 an, page et service worker toujours revérifiés
+(spa) {
+	header /assets/* Cache-Control "public, max-age=31536000, immutable"
+	@fresh path / /index.html /sw.js /registerSW.js /manifest.webmanifest
+	header @fresh Cache-Control "no-cache"
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+(security) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
+
+# Site des clients (PWA)
+{$SITE_DOMAIN} {
+	import security
+	root * /srv/site
+	import backend
+	import spa
+}
+
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+# Dashboard du patron
+{$ADMIN_DOMAIN} {
+	import security
+	header X-Robots-Tag "noindex, nofollow"
+	root * /srv/admin
+	import backend
+	import spa
+}
+
+# API pour l'app mobile du patron
+{$API_DOMAIN} {
+	import security
+	reverse_proxy nginx:80
+}
