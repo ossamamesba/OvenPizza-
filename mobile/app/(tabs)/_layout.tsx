@@ -1,6 +1,7 @@
 import type { ColorValue } from 'react-native'
 import { Tabs } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
+import { useNotificationNavigation } from '../../src/notifications/useNotificationNavigation'
 import { colors, fonts } from '../../src/theme'
 
 type IconName = keyof typeof Ionicons.glyphMap
@@ -14,6 +15,7 @@ const tab = (title: string, icon: IconName, iconActive: IconName) => ({
 
 /** Navigation principale en bas de l'écran (5 onglets maximum, icône + texte). */
 export default function TabsLayout() {
+  useNotificationNavigation()
   return (
     <Tabs
       screenOptions={{

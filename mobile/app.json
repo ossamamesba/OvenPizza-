@@ -16,7 +16,8 @@
         "backgroundColor": "#FFF8F0",
         "foregroundImage": "./assets/android-icon-foreground.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -39,6 +40,14 @@
         "expo-image-picker",
         {
           "photosPermission": "L'app accède à vos photos pour ajouter la photo d'une pizza."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#c62828",
+          "defaultChannel": "reservations"
         }
       ]
     ],
