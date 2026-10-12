@@ -87,6 +87,10 @@ export function ReservationPage() {
       return
     }
 
+    // Onglet ouvert dès le clic (sinon le navigateur le bloque), puis dirigé vers WhatsApp
+    // une fois la réservation enregistrée : un seul clic = dashboard + WhatsApp.
+    const whatsappWindow = window.open('', '_blank')
+    if (whatsappWindow) whatsappWindow.opener = null
     setSubmitting(true)
     try {
       const reservation = await createReservation({
@@ -103,9 +107,13 @@ export function ReservationPage() {
         items: summary.items.map((i) => ({ pizzaId: i.pizza.id, quantity: i.quantity })),
       })
       setConfirmed(reservation)
+      const url = whatsappHref(reservationMessage(reservation))
+      if (whatsappWindow) whatsappWindow.location.href = url
+      else window.location.assign(url)
       order.clear()
       window.scrollTo(0, 0)
     } catch (error) {
+      whatsappWindow?.close()
       if (error instanceof ApiError && Object.keys(error.violations).length > 0) {
         setErrors(Object.fromEntries(Object.entries(error.violations).map(([field, messages]) => [field.replace(/\[.*$/, ''), messages[0]])))
       } else {
@@ -130,14 +138,16 @@ export function ReservationPage() {
             <strong>{confirmed.time}</strong> ({confirmed.packName} : {itemsLabel(confirmed)}) est bien reçue.
           </p>
           <div className="mt-6 rounded-xl bg-success-soft p-5">
-            <p className="font-semibold text-success">Dernière étape : envoyez-nous le récapitulatif sur WhatsApp pour suivre votre demande.</p>
+            <p className="font-semibold text-success">
+              WhatsApp s'est ouvert avec votre récapitulatif : appuyez sur <strong>Envoyer ➤</strong> pour nous le transmettre.
+            </p>
             <a
               href={whatsappHref(reservationMessage(confirmed))}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 text-lg font-bold text-[#0b3d1f] transition-colors hover:bg-[#1fbe5b] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              <MessageCircle className="size-5" aria-hidden="true" /> Envoyer sur WhatsApp
+              <MessageCircle className="size-5" aria-hidden="true" /> Rouvrir WhatsApp
             </a>
           </div>
           <p className="mt-6 text-sm text-muted">Sinon, nous vous recontactons au <strong>{confirmed.phone}</strong> pour confirmer.</p>
@@ -286,7 +296,7 @@ export function ReservationPage() {
             {submitting && <Loader2 className="size-5 animate-spin" aria-hidden="true" />}
             {submitting ? 'Envoi en cours…' : 'Envoyer ma demande'}
           </button>
-          <p className="mt-3 text-center text-sm text-muted">Aucun paiement en ligne : nous vous recontactons pour confirmer.</p>
+          <p className="mt-3 text-center text-sm text-muted">Aucun paiement en ligne. Après l'envoi, WhatsApp s'ouvre avec votre récapitulatif.</p>
         </form>
 
         {/* Récapitulatif de la sélection */}
