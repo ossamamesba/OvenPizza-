@@ -87,9 +87,11 @@ export function ReservationPage() {
       return
     }
 
-    // Onglet ouvert dès le clic (sinon le navigateur le bloque), puis dirigé vers WhatsApp
-    // une fois la réservation enregistrée : un seul clic = dashboard + WhatsApp.
-    const whatsappWindow = window.open('', '_blank')
+    // Un seul clic = dashboard + WhatsApp. Sur téléphone, WhatsApp s'ouvre depuis la page elle-même
+    // (fonctionne aussi dans le navigateur d'Instagram ou de Facebook, qui bloquent les nouveaux onglets).
+    // Sur ordinateur, l'onglet WhatsApp Web est ouvert dès le clic (sinon bloqué), puis dirigé une fois la réservation enregistrée.
+    const isPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    const whatsappWindow = isPhone ? null : window.open('', '_blank')
     if (whatsappWindow) whatsappWindow.opener = null
     setSubmitting(true)
     try {
@@ -109,7 +111,7 @@ export function ReservationPage() {
       setConfirmed(reservation)
       const url = whatsappHref(reservationMessage(reservation))
       if (whatsappWindow) whatsappWindow.location.href = url
-      else window.location.assign(url)
+      else window.location.href = url
       order.clear()
       window.scrollTo(0, 0)
     } catch (error) {
