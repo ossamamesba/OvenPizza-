@@ -1,3 +1,5 @@
+import { whatsappUrl } from '@shared/lib/whatsapp'
+
 /**
  * Informations du traiteur affichées sur le site.
  * (Les packs, les pizzas et les prix, eux, viennent TOUJOURS de l'API.)
@@ -18,5 +20,5 @@ export const restaurant = {
 export const phoneHref = `tel:${restaurant.phone.replace(/\s/g, '')}`
 
 export function whatsappHref(message = "Bonjour Oven's Pizza Party, je souhaite des informations pour un événement.") {
-  return `https://wa.me/${restaurant.whatsapp}?text=${encodeURIComponent(message)}`
+  return whatsappUrl(restaurant.whatsapp, message)
 }

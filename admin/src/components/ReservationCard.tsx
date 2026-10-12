@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { CalendarDays, Clock, Phone } from 'lucide-react'
+import { CalendarDays, Clock, MessageCircle, Phone } from 'lucide-react'
 import type { AdminReservation } from '@shared/api/types'
 import { formatDate } from '@shared/lib/format'
+import { customerGreeting, whatsappUrl } from '@shared/lib/whatsapp'
 import { ReservationActions } from './ReservationActions'
 import { ReservationSummary } from './ReservationSummary'
 import { StatusBadge } from './ui/StatusBadge'
@@ -22,6 +23,12 @@ export function ReservationCard({ reservation, onUpdated }: { reservation: Admin
           <li>
             <a href={`tel:${reservation.phone.replace(/\s/g, '')}`} className="flex items-center gap-1.5 font-semibold text-foreground hover:text-primary">
               <Phone className="size-4" aria-hidden="true" />{reservation.phone}
+            </a>
+          </li>
+          <li>
+            <a href={whatsappUrl(reservation.phone, customerGreeting(reservation))} target="_blank" rel="noreferrer"
+              className="flex items-center gap-1.5 font-semibold text-success hover:underline">
+              <MessageCircle className="size-4" aria-hidden="true" />WhatsApp
             </a>
           </li>
         </ul>

@@ -1,8 +1,9 @@
 import { useCallback, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ExternalLink, Phone } from 'lucide-react'
+import { ArrowLeft, ExternalLink, MessageCircle, Phone } from 'lucide-react'
 import { formatDate, formatPrice } from '@shared/lib/format'
 import { cityLabel, guestsLabel } from '@shared/lib/labels'
+import { customerGreeting, whatsappUrl } from '@shared/lib/whatsapp'
 import { getReservation } from '../api/admin'
 import { useAsync } from '../hooks/useAsync'
 import { PageTitle } from '../components/PageTitle'
@@ -85,6 +86,9 @@ export function ReservationDetailPage() {
             <div className="mt-8 flex flex-wrap items-start gap-3 border-t border-border pt-6">
               <a href={`tel:${reservation.phone.replace(/\s/g, '')}`} className={buttonClass('secondary')}>
                 <Phone className="size-4" aria-hidden="true" /> Appeler le client
+              </a>
+              <a href={whatsappUrl(reservation.phone, customerGreeting(reservation))} target="_blank" rel="noreferrer" className={buttonClass('secondary')}>
+                <MessageCircle className="size-4" aria-hidden="true" /> WhatsApp client
               </a>
               <ReservationActions reservation={reservation} onUpdated={(updated) => setData(() => updated)} />
             </div>

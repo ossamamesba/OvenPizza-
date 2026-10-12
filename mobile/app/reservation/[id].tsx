@@ -3,6 +3,7 @@ import { Linking, StyleSheet, View } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { formatDate, formatPrice } from '@shared/lib/format'
 import { cityLabel, guestsLabel } from '@shared/lib/labels'
+import { customerGreeting, whatsappUrl } from '@shared/lib/whatsapp'
 import { getReservation } from '../../src/api/reservations'
 import { AppText } from '../../src/components/AppText'
 import { Button } from '../../src/components/Button'
@@ -70,6 +71,7 @@ export default function ReservationDetailScreen() {
 
       <ReservationActions reservation={r} onUpdated={(updated) => setData(() => updated)} />
       <Button label="Appeler le client" icon="call-outline" variant="secondary" onPress={() => Linking.openURL(`tel:${r.phone.replace(/\s/g, '')}`)} />
+      <Button label="WhatsApp client" icon="logo-whatsapp" variant="secondary" onPress={() => Linking.openURL(whatsappUrl(r.phone, customerGreeting(r)))} />
       {r.address && <Button label="Ouvrir l'adresse dans Maps" icon="map-outline" variant="secondary" onPress={() => Linking.openURL(mapsUrl)} />}
     </Screen>
   )

@@ -1,9 +1,10 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle2, Loader2, Pencil } from 'lucide-react'
+import { CheckCircle2, Loader2, MessageCircle, Pencil } from 'lucide-react'
 import type { GuestRange, Reservation, ServiceCity } from '@shared/api/types'
 import { formatDate, formatPrice, toIsoDate } from '@shared/lib/format'
 import { CITIES, GUEST_RANGES, guestsLabel, itemsLabel } from '@shared/lib/labels'
+import { reservationMessage } from '@shared/lib/whatsapp'
 import { ApiError } from '../api/client'
 import { createReservation } from '../api/reservations'
 import { ButtonLink } from '../components/ButtonLink'
@@ -123,12 +124,24 @@ export function ReservationPage() {
         <div role="status" className="rounded-card bg-surface p-8 text-center shadow-card ring-1 ring-border">
           <CheckCircle2 className="mx-auto size-14 text-success" aria-hidden="true" />
           <h1 className="mt-4 text-3xl font-bold">Demande envoyée !</h1>
+          <p className="mt-2 font-semibold">Réservation n°{confirmed.id}</p>
           <p className="mt-3 text-muted">
             Merci {confirmed.customerName}. Votre demande pour le <strong>{formatDate(confirmed.date)}</strong> à{' '}
             <strong>{confirmed.time}</strong> ({confirmed.packName} : {itemsLabel(confirmed)}) est bien reçue.
-            Nous vous recontactons au <strong>{confirmed.phone}</strong> pour la confirmer.
           </p>
-          <ButtonLink to="/" variant="outline" className="mt-8">Retour à l'accueil</ButtonLink>
+          <div className="mt-6 rounded-xl bg-success-soft p-5">
+            <p className="font-semibold text-success">Dernière étape : envoyez-nous le récapitulatif sur WhatsApp pour suivre votre demande.</p>
+            <a
+              href={whatsappHref(reservationMessage(confirmed))}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 text-lg font-bold text-[#0b3d1f] transition-colors hover:bg-[#1fbe5b] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <MessageCircle className="size-5" aria-hidden="true" /> Envoyer sur WhatsApp
+            </a>
+          </div>
+          <p className="mt-6 text-sm text-muted">Sinon, nous vous recontactons au <strong>{confirmed.phone}</strong> pour confirmer.</p>
+          <ButtonLink to="/" variant="outline" className="mt-6">Retour à l'accueil</ButtonLink>
         </div>
       </div>
     )
