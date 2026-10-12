@@ -34,6 +34,7 @@ $COMPOSE exec -T php composer install --no-dev --optimize-autoloader --classmap-
 $COMPOSE exec -T php php bin/console lexik:jwt:generate-keypair --skip-if-exists
 $COMPOSE exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 $COMPOSE exec -T php php bin/console app:catalog:init
+$COMPOSE exec -T php php bin/console app:images:optimize
 $COMPOSE exec -T php php bin/console cache:clear
 
 step "Mise en ligne (HTTPS)"

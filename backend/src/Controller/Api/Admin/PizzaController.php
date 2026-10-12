@@ -98,14 +98,14 @@ final class PizzaController extends AbstractController
             maxSizeMessage: 'Image trop lourde (5 Mo maximum).',
         ));
         if (\count($errors) > 0) {
-            $violations = new ConstraintViolationList();
-            foreach ($errors as $error) {
-                $violations->add(new ConstraintViolation($error->getMessage(), null, [], null, 'image', null));
-            }
-            throw new ValidationFailedException($file, $violations);
+            throw $this->imageError($file, ...array_map(static fn ($error) => (string) $error->getMessage(), iterator_to_array($errors)));
         }
 
-        $previous = $this->images->store($pizza, $file);
+        try {
+            $previous = $this->images->store($pizza, $file);
+        } catch (\RuntimeException) {
+            throw $this->imageError($file, 'Photo illisible, essayez une autre image.');
+        }
         try {
             $this->em->flush();
         } catch (\Throwable $e) {
@@ -142,5 +142,16 @@ final class PizzaController extends AbstractController
             ]));
         }
         $pizza->setPack($pack);
+    }
+
+    /** Erreur de validation sur le champ « image », au format commun de l'API. */
+    private function imageError(UploadedFile $file, string ...$messages): ValidationFailedException
+    {
+        $violations = new ConstraintViolationList();
+        foreach ($messages as $message) {
+            $violations->add(new ConstraintViolation($message, null, [], null, 'image', null));
+        }
+
+        return new ValidationFailedException($file, $violations);
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Header } from './Header'
 import { Footer } from './Footer'
@@ -28,7 +28,10 @@ export function Layout() {
       </a>
       <Header />
       <main id="contenu" ref={mainRef} tabIndex={-1} className="flex-1 outline-none">
-        <Outlet />
+        {/* Pages chargées à la demande (voir App.tsx) : message bref le temps du premier téléchargement */}
+        <Suspense fallback={<p role="status" className="py-24 text-center text-muted">Chargement…</p>}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </div>

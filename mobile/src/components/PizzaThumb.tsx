@@ -5,7 +5,7 @@ import { colors, radius } from '../theme'
 
 /** Photo de la pizza, ou le logo si elle n'en a pas encore. */
 export function PizzaThumb({ image, size = 56 }: { image: string | null; size?: number }) {
-  const url = pizzaImageUrl(image, API_URL)
+  const url = pizzaImageUrl(image, API_URL, size > 120 ? 'full' : 'thumb') // vignette légère pour les petites images
   return url ? (
     <Image source={{ uri: url }} style={[styles.base, { width: size, height: size }]} accessibilityIgnoresInvertColors />
   ) : (

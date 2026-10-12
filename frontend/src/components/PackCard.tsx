@@ -32,7 +32,7 @@ export function PackCard({ pack, selected = false, onSelect }: Props) {
       </p>
       <ul className="mt-5 flex -space-x-3" aria-label={`Pizzas du ${pack.name}`}>
         {pack.pizzas.map((pizza) => {
-          const url = pizzaImageUrl(pizza.image, API_URL)
+          const url = pizzaImageUrl(pizza.image, API_URL, 'thumb')
           return (
             <li key={pizza.id} title={pizza.name}>
               {url ? (

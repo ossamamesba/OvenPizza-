@@ -5,9 +5,15 @@ export function formatPrice(price: string): string {
   return `${priceFormatter.format(Number(price))} DH`
 }
 
-/** URL de la photo d'une pizza (baseUrl = URL de l'API, vide si même domaine). */
-export function pizzaImageUrl(image: string | null, baseUrl = ''): string | null {
-  return image ? `${baseUrl}/uploads/pizzas/${encodeURIComponent(image)}` : null
+/**
+ * URL de la photo d'une pizza (baseUrl = URL de l'API, vide si même domaine).
+ * 'thumb' : vignette légère (240 px) pour les petites images rondes ; les photos optimisées par le serveur
+ * existent en deux versions, « abc.webp » et « abc-thumb.webp » (voir PizzaImageStorage côté Symfony).
+ */
+export function pizzaImageUrl(image: string | null, baseUrl = '', size: 'full' | 'thumb' = 'full'): string | null {
+  if (!image) return null
+  const file = size === 'thumb' && image.endsWith('.webp') ? image.replace(/\.webp$/, '-thumb.webp') : image
+  return `${baseUrl}/uploads/pizzas/${encodeURIComponent(file)}`
 }
 
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })

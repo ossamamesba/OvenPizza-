@@ -168,7 +168,7 @@ function PizzaForm({ pizza, packs, presetPackId }: { pizza: AdminPizza | null; p
             {preview && file ? (
               <img src={preview} alt="Aperçu de la nouvelle photo" className="aspect-[4/3] w-full rounded-xl object-cover" />
             ) : (
-              <PizzaThumb image={shownImage} className="aspect-[4/3] w-full" />
+              <PizzaThumb image={shownImage} className="aspect-[4/3] w-full" size="full" />
             )}
           </div>
           <label className="mt-4 flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full font-semibold ring-1 ring-border hover:ring-foreground/30 has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent">

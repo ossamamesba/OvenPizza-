@@ -1,11 +1,14 @@
+import { lazy } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/layout/Layout'
 import { OrderProvider } from './order/OrderProvider'
-import { ContactPage } from './pages/ContactPage'
 import { HomePage } from './pages/HomePage'
-import { NotFoundPage } from './pages/NotFoundPage'
-import { PacksPage } from './pages/PacksPage'
-import { ReservationPage } from './pages/ReservationPage'
+
+// L'accueil est inclus d'office ; les autres pages ne sont téléchargées qu'à la première visite.
+const PacksPage = lazy(() => import('./pages/PacksPage').then((m) => ({ default: m.PacksPage })))
+const ReservationPage = lazy(() => import('./pages/ReservationPage').then((m) => ({ default: m.ReservationPage })))
+const ContactPage = lazy(() => import('./pages/ContactPage').then((m) => ({ default: m.ContactPage })))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
 
 export default function App() {
   return (
